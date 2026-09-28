@@ -4,6 +4,9 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   worker: { format: 'es' },
+  // GitHub Pages serves a project site from a subpath (/PyLearn/), so the asset
+  // base is configurable at build time. Local dev and the Node server use '/'.
+  base: process.env.VITE_BASE || '/',
   server: {
     port: 5183,
     strictPort: true,

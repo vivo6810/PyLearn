@@ -4,7 +4,7 @@ import { tracks } from '../curriculum'
 import { Icon } from './Icon'
 
 export function Settings({ navigate }: { navigate: (v: string) => void }) {
-  const { progress, resetAll, auth, guest, signOut } = useApp()
+  const { progress, resetAll, auth, guest, accountsEnabled, signOut } = useApp()
   const [signingOut, setSigningOut] = useState(false)
 
   async function handleSignOut() {
@@ -67,7 +67,7 @@ export function Settings({ navigate }: { navigate: (v: string) => void }) {
               </button>
             </div>
           </>
-        ) : (
+        ) : accountsEnabled ? (
           <>
             <p className="muted">
               {guest
@@ -80,6 +80,11 @@ export function Settings({ navigate }: { navigate: (v: string) => void }) {
               </button>
             </div>
           </>
+        ) : (
+          <p className="muted">
+            This deployment runs without accounts yet, so your progress, XP and certificates are saved in this browser
+            only. Clearing site data will lose them — use the backup tools below to keep a copy.
+          </p>
         )}
       </section>
 

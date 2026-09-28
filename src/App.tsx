@@ -49,7 +49,7 @@ function initials(name: string): string {
 
 function Shell() {
   const [view, setView] = useState<View>(parseHash)
-  const { theme, toggleTheme, toasts, auth, authReady, guest } = useApp()
+  const { theme, toggleTheme, toasts, auth, authReady, accountsEnabled, guest } = useApp()
 
   useEffect(() => {
     const onHash = () => setView(parseHash())
@@ -62,21 +62,25 @@ function Shell() {
     setView(v as View)
   }
 
-  // Signing in *from* the #/auth route has to leave that route behind,
-  // otherwise the gate would keep rendering on top of the signed-in app.
+  // Signing in *from* the #/auth route has to leave that route behind, otherwise
+  // the gate would keep rendering on top of the signed-in app. The same applies
+  // to a static deploy with no accounts, where #/auth can never do anything.
   useEffect(() => {
-    if (auth && view === 'auth') {
-      location.hash = '/dashboard'
-      setView('dashboard')
+    if (!authReady || view !== 'auth') return
+    const target = auth ? 'dashboard' : accountsEnabled ? null : 'landing'
+    if (target) {
+      location.hash = '/' + target
+      setView(target)
     }
-  }, [auth, view])
+  }, [auth, view, authReady, accountsEnabled])
 
   const root = view.split(':')[0]
   // The session cookie is checked once on boot; until then we don't know which
   // profile to show, so render a brief splash rather than flashing the wrong one.
   const checkingSession = !authReady
-  const needsAuth = authReady && !auth && !guest && PROTECTED.includes(root)
-  const showAuth = needsAuth || (root === 'auth' && !auth)
+  // Gating only makes sense when an account API actually exists.
+  const needsAuth = accountsEnabled && authReady && !auth && !guest && PROTECTED.includes(root)
+  const showAuth = needsAuth || (accountsEnabled && root === 'auth' && !auth)
 
   if (checkingSession) {
     return (
@@ -109,11 +113,11 @@ function Shell() {
                 <span className="avatar">{initials(auth.name)}</span>
                 <span className="account-name">{auth.name}</span>
               </button>
-            ) : (
+            ) : accountsEnabled ? (
               <button className="toplink" onClick={() => navigate('auth')} title="Sign in">
                 <Icon name="lock" size={16} /> Sign in
               </button>
-            )}
+            ) : null}
             <button className="toplink" onClick={toggleTheme} title="Toggle theme">
               <Icon name={theme === 'dark' ? 'sun' : 'moon'} size={16} />
             </button>

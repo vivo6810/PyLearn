@@ -15,8 +15,8 @@ import {
   todayKey,
 } from './storage'
 import {
-  fetchMe,
   fetchRemoteProgress,
+  fetchSession,
   pushRemoteProgress,
   signIn as apiSignIn,
   signOut as apiSignOut,
@@ -50,9 +50,11 @@ interface Ctx {
   resetAll: () => void
   toasts: Toast[]
   pushToast: (text: string, icon?: string) => void
-  /** Account state. `authReady` is false until the session cookie is checked. */
+  /** Account state. `authReady` is false until the API has been probed. */
   auth: AuthUser | null
   authReady: boolean
+  /** False on a static-only deploy (no API): the app runs guest-only. */
+  accountsEnabled: boolean
   guest: boolean
   signUp: (email: string, password: string, name: string) => Promise<void>
   signIn: (email: string, password: string) => Promise<void>
@@ -81,6 +83,7 @@ export function AppProvider({ tracks, children }: { tracks: Track[]; children: R
   const toastSeq = useRef(0)
   const [auth, setAuth] = useState<AuthUser | null>(null)
   const [authReady, setAuthReady] = useState(false)
+  const [accountsEnabled, setAccountsEnabled] = useState(false)
   const [guest, setGuest] = useState(() => {
     try {
       return localStorage.getItem(GUEST_KEY) === '1'
@@ -168,16 +171,17 @@ export function AppProvider({ tracks, children }: { tracks: Track[]; children: R
     setAuth(user)
   }, [])
 
-  // Resolve the session cookie once on boot; the cookie is what makes a
-  // returning learner land straight in their account without signing in again.
+  // Probe the API once on boot. The session cookie is what lets a returning
+  // learner land straight in their account; if there is no API at all (a
+  // static-only deploy) the app simply stays on the guest profile.
   useEffect(() => {
     let cancelled = false
     ;(async () => {
       try {
-        const user = await fetchMe()
-        if (user && !cancelled) await applyAccount(user)
-      } catch {
-        /* server unreachable — keep using the guest profile */
+        const { available, user } = await fetchSession()
+        if (cancelled) return
+        setAccountsEnabled(available)
+        if (available && user) await applyAccount(user)
       } finally {
         if (!cancelled) setAuthReady(true)
       }
@@ -427,6 +431,7 @@ export function AppProvider({ tracks, children }: { tracks: Track[]; children: R
     pushToast,
     auth,
     authReady,
+    accountsEnabled,
     guest,
     signUp,
     signIn,

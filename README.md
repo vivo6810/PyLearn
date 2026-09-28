@@ -2,18 +2,40 @@
 
 A mobile-first Python course — beginner to advanced — that runs real Python in
 the browser via Pyodide. 33 lessons across 6 tracks, quizzes, hidden-test
-exercises, XP, achievements, certificates, and a full account system.
+exercises, XP, achievements and certificates.
 
-## Quick start
+**Live site: https://vivo6810.github.io/PyLearn/** — deployed from `main` by
+GitHub Actions on every push.
+
+## Guest mode (GitHub Pages)
+
+The Pages deployment is the **client only** — GitHub Pages serves static files
+and cannot run the Node backend that accounts need. On that deployment the app
+detects the missing API on boot and runs in guest mode:
+
+- Everything works: lessons, in-browser Python, quizzes, exercises, XP,
+  achievements, certificates.
+- Progress, drafts and notes are saved in **this browser's localStorage only**.
+- The account/sign-in screens are hidden, and Settings explains the local-only
+  storage. Use **Settings → Export backup** to keep a copy or move progress to
+  another browser.
+
+Real accounts (sign-up, sign-in, cross-device progress) require running the
+Node server — see [Deploying with accounts](#deploying-with-accounts). The code
+is already wired for both: the same build enables accounts automatically when
+the API is reachable.
+
+## Quick start (local, full features)
 
 ```bash
 npm install
 npm run dev:all      # API on :5184 + Vite on :5183
 ```
 
-Open http://localhost:5183.
+Open http://localhost:5183 — accounts, sign-up and server-synced progress all
+work locally.
 
-`dev:all` runs both processes; alternatively run them in separate terminals:
+Run the two processes separately instead, if you prefer:
 
 ```bash
 npm run server       # API only
@@ -35,7 +57,7 @@ npm run dev          # Vite only (proxies /api to the API)
 
 ```
 src/                 React + TypeScript app (Vite)
-  pyodide/           Web Worker running CPython via Pyodide
+  pyodide/           Web Worker running CPython via Pyodide (loaded from CDN)
   curriculum/        The course content, as typed data
   state/             App context, per-account storage, API client
 server/              Node backend — zero dependencies
@@ -46,35 +68,32 @@ server/              Node backend — zero dependencies
 ```
 
 The backend deliberately uses **only Node built-ins** — `node:http`,
-`node:sqlite` and `node:crypto` — so there is nothing to install, no native
-module to compile, and no dependency supply chain.
+`node:sqlite` and `node:crypto` — so there is nothing to install and no native
+module to compile.
 
 In development Vite proxies `/api` to the API process, so the browser stays on
-a single origin and the session cookie is same-origin (no CORS involved). In
-production one Node process serves both `dist/` and `/api`.
+one origin and the session cookie needs no CORS handling. In production one
+Node process serves both `dist/` and `/api`.
 
 ## Accounts
 
-Learners sign up once; a session cookie keeps them signed in for 30 days, so
-they never have to sign up again. Progress is namespaced per account and synced
-to the server, so XP, lessons and certificates follow them to any browser.
+When the backend is running (locally, or on a Node host):
 
-Implemented:
-
-- Passwords hashed with **scrypt** (N=32768) and a per-user random salt,
+- Learners sign up once; an HttpOnly session cookie keeps them signed in for
+  30 days, so they never have to sign up again.
+- Passwords are hashed with **scrypt** (N=32768) with a per-user random salt and
   compared in constant time.
 - Sessions store only a **SHA-256 hash of the token**, so a database leak can't
-  be replayed. The cookie is `HttpOnly` + `SameSite=Lax`, and `Secure` whenever
-  the request arrives over HTTPS.
+  be replayed. The cookie is `HttpOnly` + `SameSite=Lax`, and `Secure` over HTTPS.
 - Login failures return one message whether or not the email exists, so the
   endpoint can't be used to discover which emails are registered.
-- Per-IP rate limiting on sign-up and sign-in, a 512 KB request body cap, input
-  validation, and static file serving that is guarded against path traversal.
-- "Continue without an account" keeps the app usable offline; work done that way
-  is adopted into the first account created on that device.
+- Per-IP rate limiting on sign-up and sign-in, a request-body size cap, input
+  validation, and path-traversal-safe static serving.
+- Progress is namespaced per account and synced to the server. Work done as a
+  guest is adopted into the first account created on that device.
 
-Not implemented (worth knowing before this is public): no password reset, no
-email verification, and rate limiting is per-process in memory.
+Known gaps: no password reset, no email verification, rate limiting is
+per-process in memory.
 
 ## Environment variables
 
@@ -83,14 +102,30 @@ email verification, and rate limiting is per-process in memory.
 | `PORT` | `5184` | Port the API listens on |
 | `PYLEARN_DATA_DIR` | `server/data` | Where `pylearn.db` lives |
 | `PYLEARN_COOKIE_SECURE` | off | Force the `Secure` cookie flag |
+| `VITE_BASE` | `/` | Asset base path (Pages builds use `/PyLearn/`) |
 
 ## Deploying
 
-The free static-only options (GitHub Pages, Netlify, Vercel as a static site)
-**cannot host this app** — it needs a running Node process for accounts. Use a
-host that runs Node.
+### GitHub Pages (current — guest mode)
+
+Automatic: push to `main` and the workflow in
+`.github/workflows/deploy-pages.yml` builds the site and publishes it.
+
+One-time setup, if not enabled yet: repository **Settings → Pages →
+Build and deployment → Source: “GitHub Actions”**. After that, every push
+deploys. The site is served from `/PyLearn/`, which the build handles via
+`VITE_BASE`.
+
+### Deploying with accounts
+
+Static hosts (GitHub Pages, Netlify, static Vercel) **cannot** run the API. To
+get real accounts, deploy the Node server to any host that runs Node:
 
 **Render:** `render.yaml` is a ready blueprint — point Render at this repo.
+Note that durable accounts need a persistent disk: on the free plan the
+filesystem is ephemeral and the SQLite database (and every account) is wiped on
+each deploy — uncomment the `disk` block and `PYLEARN_DATA_DIR` in
+`render.yaml` when you want durability.
 
 **Anywhere with Docker** (Fly.io, Railway, Koyeb, Render):
 
@@ -99,11 +134,10 @@ docker build -t pylearn .
 docker run -p 8080:8080 -v pylearn-data:/data pylearn
 ```
 
-> **Persist the database.** On hosts with an ephemeral filesystem the SQLite file
-> is lost on every deploy or restart, which silently deletes all accounts. Attach
-> a volume at `/data` (Docker) or set `PYLEARN_DATA_DIR` to the mounted disk.
-> On Render the free instance has no disk — uncomment the `disk` block and
-> `PYLEARN_DATA_DIR` in `render.yaml` when you want durable accounts.
+> **Persist the database.** On hosts with an ephemeral filesystem the SQLite
+> file is lost on every deploy or restart, which silently deletes all accounts.
+> Attach a volume at `/data` (Docker) or set `PYLEARN_DATA_DIR` to the mounted
+> disk.
 
 Set `PYLEARN_COOKIE_SECURE=1` when serving over HTTPS if your host doesn't
 forward `X-Forwarded-Proto`.

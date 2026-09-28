@@ -52,9 +52,32 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   return payload as T
 }
 
-export async function fetchMe(): Promise<AuthUser | null> {
-  const { user } = await request<{ user: AuthUser | null }>('/auth/me')
-  return user
+export interface SessionProbe {
+  /** False when there is no account API at all (a static-only deploy). */
+  available: boolean
+  user: AuthUser | null
+}
+
+/**
+ * Ask the server who we are, while also working out whether an account API
+ * exists at all. A static host (e.g. GitHub Pages) answers an unknown path with
+ * a 404 or with HTML, and both must mean "no accounts" rather than an error.
+ */
+export async function fetchSession(): Promise<SessionProbe> {
+  try {
+    const res = await fetch('/api/auth/me', {
+      credentials: 'same-origin',
+      signal: AbortSignal.timeout(6000),
+    })
+    if (!res.ok) return { available: false, user: null }
+    const payload = JSON.parse(await res.text())
+    if (!payload || typeof payload !== 'object' || !('user' in payload)) {
+      return { available: false, user: null }
+    }
+    return { available: true, user: payload.user ?? null }
+  } catch {
+    return { available: false, user: null }
+  }
 }
 
 export async function signUp(input: { email: string; password: string; name?: string }): Promise<AuthUser> {
