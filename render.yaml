@@ -1,0 +1,29 @@
+# Render blueprint — deploys PyLearn as one web service that serves the built
+# app and the API. Connect this repo in Render and it will read this file.
+#
+# IMPORTANT: on the free plan the filesystem is ephemeral, so the SQLite
+# database (and therefore every account) is wiped on each deploy or restart.
+# For a login system you want the disk below: uncomment `plan` and `disk`.
+services:
+  - type: web
+    name: pylearn
+    runtime: node
+    # plan: starter          # a persistent disk requires a paid instance type
+    buildCommand: npm ci && npm run build
+    startCommand: node server/index.js
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: '24'
+      # Render terminates TLS, so the session cookie should always be Secure.
+      - key: PYLEARN_COOKIE_SECURE
+        value: '1'
+      # Only set this once the disk below is enabled — without a disk, /var/data
+      # is not writable by Render's unprivileged user and the server cannot create it.
+      # - key: PYLEARN_DATA_DIR
+      #   value: /var/data
+    # Uncomment with PYLEARN_DATA_DIR above to keep accounts across deploys:
+    # disk:
+    #   name: pylearn-data
+    #   mountPath: /var/data
+    #   sizeGB: 1
