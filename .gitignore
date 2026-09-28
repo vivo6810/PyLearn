@@ -1,0 +1,14 @@
+node_modules
+dist
+*.local
+
+# Third-party course books. These are authoring inputs for `npm run extract`
+# (and are other people's copyrighted work) — never ship or redistribute them.
+source/
+
+# Local SQLite database — holds password hashes and session tokens.
+server/data
+
+# Secrets (none are required today, but keep them out of the repo if added)
+.env
+.env.*
