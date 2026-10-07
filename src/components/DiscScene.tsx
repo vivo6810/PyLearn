@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState, useMemo } from 'react'
 import { Icon } from './Icon'
+import logoUrl from '../assets/logo.png'
 import { tracks } from '../curriculum'
+
+const hubLogo = logoUrl
 
 /** Existing images / badges that orbit the disc. We reuse the track icon set
     so no new image assets are required. */
@@ -79,7 +82,12 @@ export function DiscScene() {
       >
         {/* central hub */}
         <div className="disc-hub" aria-hidden="true">
-          <Icon name="snake" size={46} />
+          <img
+            src={hubLogo}
+            alt=""
+            className="disc-hub-logo"
+            draggable={false}
+          />
         </div>
 
         {/* orbiting track badges */}

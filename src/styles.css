@@ -826,6 +826,11 @@ code, pre, .coderunner-out, .cm-editor .cm-scroller {
   transform: translateZ(26px);
   filter: drop-shadow(0 0 14px color-mix(in srgb, var(--accent) 25%, transparent));
 }
+
+.disc-hub-logo {
+  width: clamp(64px, 16vw, 110px);
+  height: auto;
+}
 .disc-ring {
   position: absolute;
   inset: 0;
@@ -876,6 +881,7 @@ code, pre, .coderunner-out, .cm-editor .cm-scroller {
   .disc-badge-label .icon { width: 14px; height: 14px; }
   .disc-badge-title { font-size: 0.62rem; }
   .disc-caption { font-size: 0.72rem; }
+  .disc-hub-logo { width: 64px; }
 }
 
 .disc-caption-emphasis {

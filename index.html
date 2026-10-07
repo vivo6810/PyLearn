@@ -36,22 +36,150 @@
     <!-- Static first paint: crawlers and no-JS visitors get a real welcome here;
          React replaces this block entirely on mount (createRoot clears #root). -->
     <div id="root">
-      <div class="boot" role="main">
-        <img src="/favicon.png" alt="PyLearn" width="86" height="91" style="transform: rotate(-3deg)" />
-        <h1 style="font-size: 2.4rem; margin: 4px 0 10px">Learn Python by breaking it apart</h1>
-        <p class="muted" style="max-width: 620px; text-align: center; margin: 0 0 14px">
-          Welcome to <strong>PyLearn</strong> — a free, mobile-first Python course that runs
-          real Python right in your browser. <strong>35 lessons across 6 tracks</strong>, from
-          your first <code>print()</code> through functions, classes, regular expressions,
-          NumPy &amp; Pandas data analysis, desktop GUIs and web scraping. Every lesson has
-          runnable examples, a quiz and a graded exercise with hidden tests — plus XP,
-          achievements and certificates. No installs, no setup: press <b>Run</b> and the
-          code executes.
-        </p>
-        <p class="muted" style="font-size: 0.85rem; max-width: 520px; text-align: center">
-          This app needs JavaScript to run its interactive lessons — enable it and reload
-          to start learning.
-        </p>
+      <!-- Static first paint: crawlers and no-JS visitors get a real, attractive
+           landing page here. React replaces this block entirely on mount, so the
+           interactive app never sees these styles/classes. -->
+      <div class="boot landing-static" role="main">
+        <a class="brand" href="#/dashboard" style="justify-content:center; margin: 0 auto 18px; padding: 8px 10px">
+          <img src="/favicon.png" alt="" width="30" height="33" aria-hidden="true" style="transform:rotate(-3deg)" />
+          <span style="font-size:1.3rem">PyLearn</span>
+        </a>
+
+        <div class="hero-landing" style="padding:40px 20px 30px">
+          <div class="hero-glow" aria-hidden="true"></div>
+          <div class="hero-glyphs" aria-hidden="true">
+            <span class="hero-glyph" style="left:12%; top:26%; font-size:18px; opacity:.16">def </span>
+            <span class="hero-glyph" style="left:74%; top:16%; font-size:16px; opacity:.14">lambda </span>
+            <span class="hero-glyph" style="left:18%; top:74%; font-size:20px; opacity:.12">for </span>
+            <span class="hero-glyph" style="left:82%; top:64%; font-size:18px; opacity:.15">[ ] </span>
+            <span class="hero-glyph" style="left:66%; top:86%; font-size:16px; opacity:.10">=> </span>
+            <span class="hero-glyph" style="left:30%; top:12%; font-size:16px; opacity:.10">print </span>
+          </div>
+
+          <div class="parallax-inner hero-copy" style="align-items:center; text-align:center; position:relative; z-index:2">
+            <p class="hero-kicker">Beginner → advanced · from your own coursebooks</p>
+            <span class="wipe-mask">
+              <h1 class="hero-title">Learn Python by <span class="grad">breaking</span></h1>
+            </span>
+            <span class="wipe-mask">
+              <h1 class="hero-title"><span class="grad">it apart</span></h1>
+            </span>
+            <p class="hero-sub">35 deep lessons · ~47 hours · real Python running in your browser — no installs, no setup.</p>
+          </div>
+        </div>
+
+        <!-- Explicit, obvious first action -->
+        <div class="hero-cta" style="justify-content:center; margin: 6px 0 0">
+          <a class="btn primary big" href="#/dashboard" style="display:inline-flex">Start learning →</a>
+          <a class="btn ghost big" href="#/playground" style="display:inline-flex">Try the playground</a>
+        </div>
+
+        <div class="hero-stats" style="justify-content:center; margin: 24px 0 0; gap:22px; flex-wrap:wrap">
+          <div class="hstat"><strong>35</strong><span>lessons</span></div>
+          <div class="hstat"><strong>6</strong><span>tracks</span></div>
+          <div class="hstat"><strong>~47h</strong><span>of material</span></div>
+          <div class="hstat"><strong>0</strong><span>installs</span></div>
+        </div>
+
+        <!-- One real lesson example, visible without JavaScript -->
+        <section style="max-width:760px; margin:24px auto 0; padding:0 16px">
+          <div class="disc-stage"
+            style="width:min(200px, 40vw); height:min(200px, 40vw); transform:perspective(700px) rotateX(-8deg) rotateY(0deg); transform-style:preserve-3d; transition:transform .08s linear; will-change:transform">
+            <div class="disc-ring" aria-hidden="true" style="position:absolute; inset:0; transform-style:preserve-3d">
+              <div class="disc-badge"
+                style="position:absolute; top:calc(50% + 0%); left:calc(50% + 21%); width:52px; transform:translate(-50%,-50%) translateZ(20px); display:flex; flex-direction:column; gap:3px; pointer-events:none">
+                <span class="disc-badge-label" style="display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:50%; background:color-mix(in srgb, var(--bg) 80%, transparent); border:2px solid #7fae72">
+                  <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-8"/><path d="M12 13c0-3.6-2.4-6-6-6 0 3.6 2.4 6 6 6Z"/><path d="M12 11c0-3.6 2.4-6 6-6 0 3.6-2.4 6-6 6Z"/></svg>
+                </span>
+                <span class="disc-badge-title" style="font-size:.62rem">Foundations</span>
+              </div>
+              <div class="disc-badge"
+                style="position:absolute; top:calc(50% + 0%); left:calc(50% - 21%); width:52px; transform:translate(-50%,-50%) translateZ(20px); display:flex; flex-direction:column; gap:3px; pointer-events:none">
+                <span class="disc-badge-label" style="display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:50%; background:color-mix(in srgb, var(--bg) 80%, transparent); border:2px solid #6e6a58">
+                  <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h3.5V5.6a1.6 1.6 0 0 1 3.2 0V8H15a1 1 0 0 1 1 1v2.8h2.4a1.6 1.6 0 0 1 0 3.2H16V19a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/></svg>
+                </span>
+                <span class="disc-badge-title" style="font-size:.62rem">Core Python</span>
+              </div>
+            </div>
+            <div class="disc-hub" aria-hidden="true"
+              style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--accent); transform:translateZ(26px); filter:drop-shadow(0 0 14px color-mix(in srgb, var(--accent) 25%, transparent))">
+              <img src="/favicon.png" alt="" width="40" height="44" draggable="false" style="display:block; transform:rotate(-3deg)" />
+            </div>
+            <div class="disc-guide" aria-hidden="true"
+              style="position:absolute; inset:6%; border-radius:50%; border:2px dashed color-mix(in srgb, var(--ink) 22%, transparent); transform:rotateX(90deg) translateZ(4px); pointer-events:none"></div>
+          </div>
+          <p class="disc-caption" style="margin-top:10px; font-size:.78rem; color:var(--muted); text-align:center">6 tracks orbiting one disc</p>
+        </section>
+
+        <!-- Actual course-interface screenshots (from this prompt) -->
+        <section class="landing-feats" style="padding:36px 18px 24px; max-width:1060px; margin:0 auto">
+          <h2 class="sec-title center" style="margin:0 0 18px">The course in your browser, like this</h2>
+          <p class="xp-sub" style="text-align:center; color:var(--muted); margin:0 0 18px">Every lesson is a real reading, runnable examples, a quiz and a graded exercise with hidden tests. No installs — open a lesson and press Run.</p>
+          <div class="feat-grid" style="grid-template-columns:repeat(3,1fr); gap:12px">
+            <figure class="feat" style="height:auto; background:#1e1b16; border:2px solid var(--ink); box-shadow:4px 4px 0 var(--shadow-ink)">
+              <img src="screenshots/course-foundations.png" alt="PyLearn Foundations track page" loading="lazy" style="width:100%; height:auto; display:block; border-radius:8px 0 0 0" />
+              <figcaption style="font-size:.78rem; color:var(--muted); padding:8px 12px; border-top:2px solid var(--border)">Foundations — values, variables, expressions, conditionals, loops</figcaption>
+            </figure>
+            <figure class="feat" style="height:auto; background:#1e1b16; border:2px solid var(--ink); box-shadow:4px 4px 0 var(--shadow-ink)">
+              <img src="screenshots/course-core.png" alt="PyLearn Core Python track page" loading="lazy" style="width:100%; height:auto; display:block; border-radius:8px 0 0 0" />
+              <figcaption style="font-size:.78rem; color:var(--muted); padding:8px 12px; border-top:2px solid var(--border)">Core Python — functions, classes, exceptions, files</figcaption>
+            </figure>
+            <figure class="feat" style="height:auto; background:#1e1b16; border:2px solid var(--ink); box-shadow:4px 4px 0 var(--shadow-ink)">
+              <img src="screenshots/course-advanced.png" alt="PyLearn Advanced Python track page" loading="lazy" style="width:100%; height:auto; display:block; border-radius:8px 0 0 0" />
+              <figcaption style="font-size:.78rem; color:var(--muted); padding:8px 12px; border-top:2px solid var(--border)">Advanced Python — comprehensions, generators, regex</figcaption>
+            </figure>
+            <figure class="feat" style="height:auto; background:#1e1b16; border:2px solid var(--ink); box-shadow:4px 4px 0 var(--shadow-ink)">
+              <img src="screenshots/course-tkinter.png" alt="PyLearn Tkinter GUI track page" loading="lazy" style="width:100%; height:auto; display:block; border-radius:8px 0 0 0" />
+              <figcaption style="font-size:.78rem; color:var(--muted); padding:8px 12px; border-top:2px solid var(--border)">Tkinter GUI — windows, widgets, events, layout</figcaption>
+            </figure>
+            <figure class="feat" style="height:auto; background:#1e1b16; border:2px solid var(--ink); box-shadow:4px 4px 0 var(--shadow-ink)">
+              <img src="screenshots/course-automation.png" alt="PyLearn Automation & Games track page" loading="lazy" style="width:100%; height:auto; display:block; border-radius:8px 0 0 0" />
+              <figcaption style="font-size:.78rem; color:var(--muted); padding:8px 12px; border-top:2px solid var(--border)">Automation & Games — files, CSV, scraping, first games</figcaption>
+            </figure>
+            <figure class="feat" style="height:auto; background:#1e1b16; border:2px solid var(--ink); box-shadow:4px 4px 0 var(--shadow-ink)">
+              <img src="screenshots/course-playground.png" alt="PyLearn playground with syntax-highlighted Python code" loading="lazy" style="width:100%; height:auto; display:block; border-radius:8px 0 0 0" />
+              <figcaption style="font-size:.78rem; color:var(--muted); padding:8px 12px; border-top:2px solid var(--border)">Playground — edit real Python code and run it in your browser</figcaption>
+            </figure>
+          </div>
+        </section>
+
+        <!-- Why it's distinctive -->
+        <section style="max-width:760px; margin:8px auto 0; padding:8px 16px 18px; text-align:center">
+          <div style="display:flex; flex-direction:column; gap:10px; align-items:center; text-align:center">
+            <p class="feat h3" style="font-size:1.35rem; margin:0">Run the code, not just the reading</p>
+            <p style="color:var(--muted); font-size:.92rem; max-width:560px; text-align:center; margin:0">
+              Every example — including NumPy, Pandas and Matplotlib — executes in a real Python runtime (
+              <a class="link" href="#/playground">open the playground</a> to try it now). 
+              Then a hidden test suite grades your exercise, test by test, with hints when you stall.
+            </p>
+          </div>
+        </section>
+
+        <!-- Social proof -->
+        <section class="landing-tracks" style="padding:24px 18px 40px; max-width:760px; margin:0 auto">
+          <div style="display:flex; gap:14px; align-items:center; justify-content:center; flex-wrap:wrap; margin-bottom:14px">
+            <div class="stat" style="min-width:120px; padding:12px 14px; text-align:center">
+              <div class="stat-num">35</div><div class="stat-sub">lessons</div>
+            </div>
+            <div class="stat" style="min-width:120px; padding:12px 14px; text-align:center">
+              <div class="stat-num">6</div><div class="stat-sub">tracks</div>
+            </div>
+            <div class="stat" style="min-width:120px; padding:12px 14px; text-align:center">
+              <div class="stat-num">~47h</div><div class="stat-sub">of material</div>
+            </div>
+            <div class="stat" style="min-width:120px; padding:12px 14px; text-align:center">
+              <div class="stat-num">0</div><div class="stat-sub">installs</div>
+            </div>
+          </div>
+          <div style="text-align:center; color:var(--muted); font-size:.92rem; max-width:560px; margin:0 auto">
+            Free, browser-first Python from Halterman, Sweigart, Klein, Ward and Moore — 
+            structured into a 3-month path. Sign in to keep XP, streaks and certificates across any device.
+          </div>
+        </section>
+
+        <footer style="text-align:center; padding:18px 16px 24px; color:var(--muted); font-size:.78rem">
+          <strong style="color:var(--text)">PyLearn</strong> · free Python course · real Python in your browser · no installs
+        </footer>
       </div>
     </div>
     <script type="module" src="/src/main.tsx"></script>
