@@ -8,7 +8,7 @@ export const advanced: Track = {
   title: 'Advanced Python',
   blurb: 'Comprehensions, generators, decorators, regex and algorithmic thinking — write code that scales.',
   icon: 'rocket',
-  accent: '#c084fc',
+  accent: '#8a7f6a',
   modules: [
     {
       id: 'a1',

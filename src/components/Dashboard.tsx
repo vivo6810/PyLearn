@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useApp, levelFromXp } from '../state/AppContext'
-import { tracks, allLessons, totalMinutes, upcomingTracks } from '../curriculum'
+import { tracks, allLessons, totalMinutes } from '../curriculum'
 import { findLesson } from '../curriculum'
 import { ACHIEVEMENTS } from '../achievements'
 import { Icon } from './Icon'
@@ -178,13 +178,6 @@ export function Dashboard({ navigate }: { navigate: (v: string) => void }) {
       </div>
 
       <h2 className="sec-title">Achievements</h2>
-      <div style={{ marginBottom: 10 }}>
-        {upcomingTracks.map((u) => (
-          <span key={u.id} className="muted upcoming-note" style={{ fontSize: '0.85rem' }}>
-            <Icon name={u.icon} size={15} /> {u.title} — {u.note}
-          </span>
-        ))}
-      </div>
       <button className="btn ghost ach-open-btn" onClick={() => setShowAch(true)}>
         <Icon name="medal" size={16} /> View all achievements
         <span className="muted">

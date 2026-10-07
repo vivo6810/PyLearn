@@ -8,7 +8,7 @@ export const core: Track = {
   title: 'Core Python',
   blurb: 'Functions, classes, exceptions and files — the toolbox of every real Python program.',
   icon: 'puzzle',
-  accent: '#60a5fa',
+  accent: '#6e6a58',
   modules: [
     {
       id: 'c1',
@@ -718,6 +718,164 @@ assert loaded['games'] == 4
 assert loaded['high'] == 120
 `,
               hint: 'json.dump(d, open(...,"w")) — or with-block; then loaded = json.load(open(...)); loaded["games"] += 1; print(loaded).',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'c4',
+      title: 'Module 4 · Batteries Included',
+      summary: 'The standard library — import ready-made tools instead of reinventing them.',
+      lessons: [
+        {
+          id: 'c4-1',
+          title: 'Modules & the standard library',
+          minutes: 70,
+          source: 'pylearn',
+          sourceRef: 'PyLearn original · topics informed by Asabeneh 30-Days-Of-Python',
+          objectives: [
+            'Import from the standard library three ways',
+            'Pick the right stdlib module for a task',
+            'Generate reproducible randomness with random.seed',
+            'Explain the if __name__ == "__main__" idiom',
+          ],
+          sections: [
+            {
+              h: 'A module is a toolbox',
+              md: `A **module** is a file of ready-made code. Python ships with a huge collection of them — the **standard library**, nicknamed “batteries included”:\n\n\`\`\`python\nimport math\nprint(math.sqrt(144))   # 12.0\n\`\`\`\n\nYou have already used \`json\`, \`datetime\` and \`random\` in these lessons — all standard library. Dotted access (\`module.thing\`) keeps every toolbox tidy and tells readers where a name came from.`,
+            },
+            {
+              h: 'Three ways to import',
+              md: `\`\`\`python\nimport math                   # whole toolbox: math.sqrt(2)\nfrom math import sqrt, pi     # just the tools: sqrt(2)\nimport statistics as stats    # nickname: stats.mean([1, 2, 3])\n\`\`\`\n\nPrefer plain \`import\` for readability, \`from … import\` for a heavily used name, and \`as\` for long module names. Avoid \`from math import *\` — it dumps every name into your program and buries where things came from.`,
+            },
+            {
+              h: 'A quick tour',
+              md: `- \`math\` — sqrt, pi, ceil, floor, factorial\n- \`random\` — dice, shuffles, random picks\n- \`statistics\` — mean, median, stdev\n- \`datetime\` — dates & times (last lesson!)\n- \`json\` — save/load structured data (Module 3)\n- \`os\` & \`pathlib\` — files, folders, paths\n- \`re\` — regular expressions (Advanced track)\n- \`collections\` — Counter, defaultdict superpowers\n\nWhen you need a tool, check the [official library tour](https://docs.python.org/3/library/) first — chances are it is already installed.`,
+            },
+            {
+              h: 'random — repeatable chaos',
+              md: `\`random.randint(1, 6)\` rolls a die; \`random.choice(seq)\` picks an item; \`random.shuffle(lst)\` mixes a list in place.\n\nReal programs often need *reproducible* randomness — tests, demos, graded homework. \`random.seed(42)\` rewinds the generator to a fixed starting point, so every run rolls the same “random” numbers.`,
+            },
+            {
+              h: 'Your own modules',
+              md: `Save functions in a file like \`tools.py\`, then \`import tools\` from any other file in the same folder — that is exactly how modules work.\n\nAt the bottom of a module you will often see:\n\n\`\`\`python\nif __name__ == "__main__":\n    demo()\n\`\`\`\n\nThat block runs only when the file is executed **directly** — never when someone imports it. It is the standard “self-test” hook of a module.`,
+            },
+          ],
+          examples: [
+            {
+              caption: 'import math',
+              code: `import math
+
+print(math.sqrt(144))
+print(math.pi)
+print(math.ceil(4.2), math.floor(4.8))
+print(math.factorial(5))`,
+              expected: '12.0\n3.141592653589793\n5 4\n120',
+            },
+            {
+              caption: 'Three import styles',
+              code: `import math
+from math import sqrt, pi
+import statistics as stats
+
+print(sqrt(16), pi > 3)
+print(stats.mean([2, 4, 9]))
+print(math.gcd(12, 18))`,
+              expected: '4.0 True\n5\n6',
+            },
+            {
+              caption: 'Seeded dice',
+              code: `import random
+
+random.seed(7)
+rolls = []
+for _ in range(5):
+    rolls.append(random.randint(1, 6))
+print(rolls)
+print(random.choice(["red", "green", "blue"]))
+
+random.seed(7)  # rewind the randomness
+again = []
+for _ in range(5):
+    again.append(random.randint(1, 6))
+print(again)   # identical — the seed makes it repeatable`,
+              expected: '[3, 2, 4, 6, 1]\nred\n[3, 2, 4, 6, 1]',
+            },
+            {
+              caption: 'The __main__ self-test hook',
+              code: `def to_fahrenheit(celsius):
+    return celsius * 9 / 5 + 32
+
+if __name__ == "__main__":
+    print("running directly!")
+    print(to_fahrenheit(100))`,
+              expected: 'running directly!\n212.0',
+            },
+          ],
+          quiz: [
+            {
+              q: 'A module is…',
+              choices: ['a file of ready-made code you can import', 'a list that cannot change', 'a special kind of loop', 'a Python error type'],
+              answer: 0,
+              explain: 'Any .py file can be a module, and Python ships with a big collection of them — the standard library.',
+            },
+            {
+              q: 'Which import lets you call sqrt(2) directly, with no dot?',
+              choices: ['import math', 'from math import sqrt', 'import sqrt from math', 'sqrt = math'],
+              answer: 1,
+              explain: 'from math import sqrt copies the name into your program — call it without the math. prefix.',
+            },
+            {
+              q: 'After import random as rnd, you roll a die with…',
+              choices: ['random.randint(1, 6)', 'rnd.randint(1, 6)', 'rnd.randomint(1, 6)', 'roll.rnd(1, 6)'],
+              answer: 1,
+              explain: 'The as nickname replaces the module name: everything goes through rnd.',
+            },
+            {
+              q: 'Why call random.seed(42) in a program?',
+              choices: ['It makes Python faster', 'It limits random numbers to 42', 'Every run replays the same “random” sequence', 'It adds entropy to the pool'],
+              answer: 2,
+              explain: 'A fixed seed makes results reproducible — essential for tests, demos and graded work.',
+            },
+            {
+              q: 'The block under if __name__ == "__main__": runs…',
+              choices: ['when the file is imported', 'when the file is run directly', 'once per function call', 'never — it is just documentation'],
+              answer: 1,
+              explain: 'Importing sets __name__ to the module name, so the self-test block stays quiet.',
+            },
+            {
+              q: 'Which of these is NOT in the standard library?',
+              choices: ['math', 'random', 'json', 'requests'],
+              answer: 3,
+              explain: 'requests is third-party — installed separately with pip. The others ship with Python.',
+            },
+          ],
+          exercises: [
+            {
+              title: 'Seeded dice lab',
+              brief:
+                'Simulate 100 rolls of a six-sided die: `import random`, `random.seed(42)`, fill `rolls` with 100 ints from `random.randint(1, 6)`, then set `mean_rolls` to their average and `sixes` to how many rolls came up 6. The seed gives everyone the same dice.',
+              starter: `import random
+
+random.seed(42)  # same dice for everyone
+
+rolls = []        # TODO: append 100 rolls of random.randint(1, 6)
+mean_rolls = 0.0  # TODO: average of the rolls
+sixes = 0         # TODO: how many rolls equal 6
+
+print(rolls[:10], "...")
+print("mean:", mean_rolls, "sixes:", sixes)`,
+              tests: `
+import random, statistics
+random.seed(42)
+exp = [random.randint(1, 6) for _ in range(100)]
+assert rolls == exp, f'your first 5 rolls {rolls[:5]!r} vs expected {exp[:5]!r}'
+assert abs(mean_rolls - statistics.mean(exp)) < 1e-9, f'mean_rolls = {mean_rolls!r}, expected {statistics.mean(exp)!r}'
+assert sixes == exp.count(6), f'sixes = {sixes!r}, expected {exp.count(6)}'
+assert 'seed(42)' in _user_code, 'keep random.seed(42) so the dice are reproducible'
+`,
+              hint: 'Grow the list in a loop: for _ in range(100): rolls.append(random.randint(1, 6)). Then mean_rolls = sum(rolls) / len(rolls) and sixes = rolls.count(6).',
             },
           ],
         },

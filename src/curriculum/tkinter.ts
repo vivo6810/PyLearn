@@ -10,7 +10,7 @@ export const tkinter: Track = {
   title: 'Tkinter GUI',
   blurb: 'Desktop applications with Python’s built-in GUI toolkit — windows, widgets, events and layout.',
   icon: 'window',
-  accent: '#f97316',
+  accent: '#96741f',
   modules: [
     {
       id: 't1',

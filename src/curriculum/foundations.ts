@@ -7,7 +7,7 @@ export const foundations: Track = {
   title: 'Foundations',
   blurb: 'From zero to writing real programs: values, variables, expressions, conditionals, and loops.',
   icon: 'sprout',
-  accent: '#4ade80',
+  accent: '#5a6165',
   modules: [
     {
       id: 'f1',

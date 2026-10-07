@@ -4,7 +4,7 @@ import { Icon } from './Icon'
 import { Parallax } from './Parallax'
 import { ExplodedProgram } from './ExplodedProgram'
 import { tracks, allLessons, totalMinutes } from '../curriculum'
-import { upcomingTracks } from '../curriculum'
+import logoUrl from '../assets/logo.png'
 
 /** faint code glyphs floating behind the hero at different depths */
 const HERO_GLYPHS = [
@@ -33,6 +33,9 @@ export function Landing({ navigate, onStart }: { navigate: (v: string) => void; 
           ))}
         </div>
         <Parallax speed={-0.06} className="hero-copy">
+          <Appear variant="pop" delay={0}>
+            <img src={logoUrl} alt="PyLearn" className="hero-logo" draggable={false} />
+          </Appear>
           <Appear variant="soft" delay={0.05}>
             <p className="hero-kicker">
               beginner → advanced · from your own coursebooks
@@ -146,19 +149,6 @@ export function Landing({ navigate, onStart }: { navigate: (v: string) => void; 
               </Reveal>
             )
           })}
-          {upcomingTracks.map((u) => (
-            <Reveal key={u.id}>
-              <div className="ltrack upcoming">
-                <span className="ltrack-num">··</span>
-                <span className="ltrack-icon"><Icon name={u.icon} size={24} /></span>
-                <span className="ltrack-body">
-                  <strong>{u.title}</strong>
-                  <span>{u.note}</span>
-                </span>
-                <span className="ltrack-meta">soon</span>
-              </div>
-            </Reveal>
-          ))}
         </div>
         <div className="landing-cta-final">
           <Reveal>

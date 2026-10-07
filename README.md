@@ -1,7 +1,7 @@
 # PyLearn
 
 A mobile-first Python course — beginner to advanced — that runs real Python in
-the browser via Pyodide. 33 lessons across 6 tracks, quizzes, hidden-test
+the browser via Pyodide. 35 lessons across 6 tracks, quizzes, hidden-test
 exercises, XP, achievements and certificates.
 
 **Live site: https://vivo6810.github.io/PyLearn/** — deployed from `main` by

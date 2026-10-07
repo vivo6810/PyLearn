@@ -309,5 +309,146 @@ assert top_word == 'the', f'top_word = {top_word!r}'
         },
       ],
     },
+    {
+      id: 'f3-4',
+      title: 'Dates & times',
+      minutes: 70,
+      source: 'pylearn',
+      sourceRef: 'PyLearn original · topics informed by Asabeneh 30-Days-Of-Python',
+      objectives: [
+        'Create dates and read their parts',
+        'Format and parse dates with strftime / strptime',
+        'Do date arithmetic with timedelta',
+      ],
+      sections: [
+        {
+          h: 'The date object',
+          md: `Dates live in the standard library — import them:\n\n\`\`\`python\nfrom datetime import date\n\ndue = date(2026, 10, 7)\nprint(due.year, due.month, due.day)\n\`\`\`\n\nMonths count from **1** — no zero-based surprise here. Handy methods: \`.weekday()\` (Monday = 0), \`.isoformat()\`, and \`date.today()\` for the current day.`,
+        },
+        {
+          h: 'strftime — dates as text',
+          md: `\`.strftime(format)\` turns a date into a string using % codes:\n\n\`\`\`python\ndue.strftime("%d %b %Y")   # '07 Oct 2026'\ndue.strftime("%A")         # 'Wednesday'\n\`\`\`\n\nEveryday codes: \`%Y\` year · \`%m\` month · \`%d\` day · \`%b\`/\`%B\` month name · \`%A\` weekday name · \`%H:%M\` time.`,
+        },
+        {
+          h: 'strptime — text as dates',
+          md: `The mirror twin: \`datetime.strptime(text, format)\` **parses** text into a date:\n\n\`\`\`python\nfrom datetime import datetime\ndatetime.strptime("25/12/2026", "%d/%m/%Y")  # datetime(2026, 12, 25, 0, 0)\n\`\`\`\n\nIt returns a **datetime** — call \`.date()\` on it if you only want the day. The format string must match the text exactly.`,
+        },
+        {
+          h: 'timedelta — date arithmetic',
+          md: `Subtracting two dates gives a \`timedelta\` — a duration you can add back onto dates:\n\n\`\`\`python\nfrom datetime import timedelta\nweek = timedelta(days=7)\nlater = due + week          # a new date, one week on\ngap = date(2027, 1, 1) - due\nprint(gap.days)             # whole days between the dates\n\`\`\`\n\nDates are **immutable**: arithmetic never changes the original — it returns a new date.`,
+        },
+      ],
+      examples: [
+        {
+          caption: 'Meet date',
+          code: `from datetime import date
+
+release = date(2026, 10, 7)
+print(release)
+print(release.year, release.month, release.day)
+print(release.weekday())   # Mon=0 … Sun=6
+print(release.isoformat())`,
+          expected: '2026-10-07\n2026 10 7\n2\n2026-10-07',
+        },
+        {
+          caption: 'Format & parse',
+          code: `from datetime import date, datetime
+
+d = date(2026, 10, 7)
+print(d.strftime("%d %b %Y"))
+print(d.strftime("%A, %d %B %Y"))
+
+back = datetime.strptime("25/12/2026", "%d/%m/%Y")
+print(back.date())`,
+          expected: '07 Oct 2026\nWednesday, 07 October 2026\n2026-12-25',
+        },
+        {
+          caption: 'timedelta arithmetic',
+          code: `from datetime import date, timedelta
+
+launch = date(2026, 10, 7)
+party = launch + timedelta(days=30)
+print(party)
+
+new_year = date(2027, 1, 1)
+left = new_year - launch
+print(left)
+print(left.days, "days to go")`,
+          expected: '2026-11-06\n86 days, 0:00:00\n86 days to go',
+        },
+        {
+          caption: 'Right now',
+          code: `from datetime import date, datetime
+
+print(date.today())   # the day you run this
+now = datetime.now()
+print(now.year, now.month, now.day, now.hour, now.minute)
+print(now.strftime("%H:%M"))`,
+        },
+      ],
+      quiz: [
+        {
+          q: 'In date(2026, 10, 7), what does the 10 mean?',
+          choices: ['Month — Python counts months 1–12', 'Hour (military time)', 'Day of the week', 'Month index like a list (so November)'],
+          answer: 0,
+          explain: 'Dates read like dates: year, month, day — months run 1…12, no zero-based surprise.',
+        },
+        {
+          q: 'Which one turns the text "25/12/2026" into a date?',
+          choices: ['date.today()', 'datetime.strptime("25/12/2026", "%d/%m/%Y")', 'd.strftime("%d/%m/%Y")', 'str(25/12/2026)'],
+          answer: 1,
+          explain: 'strptime PARSES text with the format you give it; strftime does the opposite — formats a date into text.',
+        },
+        {
+          q: 'date(2027, 1, 1) - date(2026, 10, 7) gives…',
+          choices: ['86 (an int)', 'a timedelta — use .days to get 86', 'a new date 86 days later', 'TypeError: cannot subtract dates'],
+          answer: 1,
+          explain: 'Subtracting dates produces a timedelta; its .days attribute is the whole-day count.',
+        },
+        {
+          q: 'What does .weekday() return for a Monday?',
+          choices: ['1', '0', 'Monday', 'None'],
+          answer: 1,
+          explain: 'Monday = 0 … Sunday = 6 — handy for “is it a weekday?” checks.',
+        },
+        {
+          q: 'd = date(2026, 10, 7). What happens after d.month = 11?',
+          choices: ['The date becomes Nov 7', 'A new date is returned', 'AttributeError — dates are immutable', 'The month is appended'],
+          answer: 2,
+          explain: 'Dates cannot be mutated. Build a new one instead: d + timedelta(days=…) or d.replace(month=11).',
+        },
+        {
+          q: 'd.strftime("%d %b %Y") for 2026-10-07 makes…',
+          choices: ['"10/07/26"', '"07 Oct 2026"', '"October 7"', '"2026-10-07"'],
+          answer: 1,
+          explain: '%d zero-pads the day, %b is the short month name, %Y the four-digit year.',
+        },
+      ],
+      exercises: [
+        {
+          title: 'Countdown to New Year',
+          brief:
+            'Using `today = date(2026, 10, 7)` and `new_year = date(2027, 1, 1)`: set `left` to the whole days between them, and build `message` to read exactly `86 days until 01 Jan 2027` — computed, not typed (timedelta for the count, strftime for the date).',
+          starter: `from datetime import date, timedelta
+
+today = date(2026, 10, 7)
+new_year = date(2027, 1, 1)
+
+left = 0  # TODO: days from today until new_year
+message = ""  # TODO: "{left} days until {new_year formatted %d %b %Y}"
+
+print(left)
+print(message)`,
+          tests: `
+from datetime import date
+expected_days = (date(2027, 1, 1) - date(2026, 10, 7)).days
+assert left == expected_days, f'left = {left!r}, expected {expected_days}'
+assert message == f'{expected_days} days until {new_year.strftime("%d %b %Y")}', f'message = {message!r}'
+assert '86' not in _user_code, 'compute the number with timedelta — do not hardcode it'
+`,
+          hint: 'left = (new_year - today).days — subtracting dates gives a timedelta. Then f"{left} days until {new_year.strftime(\"%d %b %Y\")}".',
+        },
+      ],
+    },
   ],
 }

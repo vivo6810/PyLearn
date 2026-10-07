@@ -84,15 +84,6 @@ const PATHS: Record<string, ReactElement> = {
       <path d="M18 17v-8" />
     </>
   ),
-  robot: (
-    <>
-      <rect x="5" y="9" width="14" height="10" rx="2" />
-      <path d="M12 9V5" />
-      <circle cx="12" cy="4" r="1" />
-      <path d="M9 13.5h.01M15 13.5h.01" />
-      <path d="M2.5 13v2M21.5 13v2" />
-    </>
-  ),
 
   // achievements & gamification
   trophy: (

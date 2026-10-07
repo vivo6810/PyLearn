@@ -10,7 +10,7 @@ export const data: Track = {
   title: 'Data Analysis',
   blurb: 'NumPy arrays, Matplotlib plots and Pandas DataFrames — the foundation of data science in Python.',
   icon: 'chart',
-  accent: '#34d399',
+  accent: '#6a7a5c',
   modules: [
     {
       id: 'd1',

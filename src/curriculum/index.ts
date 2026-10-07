@@ -7,14 +7,9 @@ import { data } from './data'
 import { automation } from './automation'
 
 /**
- * Track registry. PyTorch/AI track joins when its source PDF arrives.
+ * Track registry.
  */
 export const tracks: Track[] = [foundations, core, advanced, tkinter, data, automation]
-
-/** Coming soon (structure ready, awaiting source PDF): AI & PyTorch */
-export const upcomingTracks = [
-  { id: 'ai', title: 'AI & PyTorch', icon: 'robot', note: 'starts when your PyTorch book is added to source/' },
-]
 
 export const allLessons: Lesson[] = tracks.flatMap((t) => t.modules.flatMap((m) => m.lessons))
 

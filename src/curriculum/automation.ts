@@ -10,7 +10,7 @@ export const automation: Track = {
   title: 'Automation & Games',
   blurb: 'Files, CSV data, web scraping — and your first playable Python games, built from scratch.',
   icon: 'terminal',
-  accent: '#f472b6',
+  accent: '#a06a58',
   modules: [
     {
       id: 'au1',
