@@ -1,0 +1,6 @@
+# https://vivo6810.github.io/robots.txt
+User-agent: *
+Allow: /
+
+# Ask well-behaved crawlers where the site map is.
+Sitemap: https://vivo6810.github.io/sitemap.xml

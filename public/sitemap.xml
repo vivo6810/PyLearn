@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- PyLearn public pages. Hash-routed lesson and track pages are generated
+       client-side, so they are surfaced through the main page + the search
+       index rather than as separate static URLs here. -->
+  <sitemap>
+    <loc>https://vivo6810.github.io/</loc>
+    <lastmod>2026-10-07</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://vivo6810.github.io/#/search</loc>
+    <lastmod>2026-10-07</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://vivo6810.github.io/#/playground</loc>
+    <lastmod>2026-10-07</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://vivo6810.github.io/#/settings</loc>
+    <lastmod>2026-10-07</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://vivo6810.github.io/#/auth</loc>
+    <lastmod>2026-10-07</lastmod>
+  </sitemap>
+</sitemapindex>

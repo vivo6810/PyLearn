@@ -2,7 +2,8 @@ import { Reveal } from './Reveal'
 import { Appear } from './Appear'
 import { Icon } from './Icon'
 import { Parallax } from './Parallax'
-import { ExplodedProgram } from './ExplodedProgram'
+import { DiscScene } from './DiscScene'
+import { FAQ } from './FAQ'
 import { tracks, allLessons, totalMinutes } from '../curriculum'
 import logoUrl from '../assets/logo.png'
 
@@ -59,7 +60,7 @@ export function Landing({ navigate, onStart }: { navigate: (v: string) => void; 
           <Appear variant="soft" delay={0.42}>
             <p className="hero-sub">
               {allLessons.length} deep lessons · ~{Math.round(totalMinutes / 60)} hours · real Python running in your
-              browser. No installs, no setup — scroll on to see what a program is made of.
+              browser. No installs, no setup — move your mouse to tilt the disc below.
             </p>
           </Appear>
           <Appear variant="btn" delay={0.55}>
@@ -67,8 +68,8 @@ export function Landing({ navigate, onStart }: { navigate: (v: string) => void; 
               <button className="btn primary big" onClick={onStart}>
                 Start learning →
               </button>
-              <button className="btn ghost big" onClick={() => document.getElementById('exploded')?.scrollIntoView({ behavior: 'smooth' })}>
-                See inside a program ↓
+              <button className="btn ghost big" onClick={() => document.getElementById('disc')?.scrollIntoView({ behavior: 'smooth' })}>
+                See the tracks ↓
               </button>
             </div>
           </Appear>
@@ -89,17 +90,17 @@ export function Landing({ navigate, onStart }: { navigate: (v: string) => void; 
         </div>
       </section>
 
-      {/* ── scroll-driven exploded program ── */}
-      <section id="exploded" className="xp-section">
+      {/* ── 3D disc: track badges orbit a tilted disc, Y-tilt follows mouse ── */}
+      <section id="disc" className="xp-section">
         <Reveal>
           <h2 className="xp-title">
-            What is a program <span className="grad">made of?</span>
+            What you will learn <span className="grad">across 6 tracks</span>
           </h2>
         </Reveal>
         <Reveal delay={100}>
-          <p className="xp-sub">Keep scrolling — the program separates into its internals, layer by layer.</p>
+          <p className="xp-sub">Move your mouse up and down — the disc tilts with it.</p>
         </Reveal>
-        <ExplodedProgram />
+        <DiscScene />
       </section>
 
       {/* ── features ── */}
@@ -158,6 +159,49 @@ export function Landing({ navigate, onStart }: { navigate: (v: string) => void; 
           </Reveal>
         </div>
       </section>
+
+      {/* ── FAQ ── */}
+      <section className="landing-faq">
+        <Parallax speed={0.05}>
+          <h2 className="sec-title center">Questions before you start?</h2>
+        </Parallax>
+        <Reveal>
+          <FAQ
+            items={landingFaq()}
+            className="center"
+          />
+        </Reveal>
+      </section>
     </div>
   )
 }
+
+function landingFaq() {
+  return [
+    {
+      q: 'Do I need to install anything?',
+      a: 'No. Every lesson runs real Python in your browser. Nothing to install, nothing to configure — just open the lesson and press Run.',
+    },
+    {
+      q: 'Can I use PyLearn on my phone?',
+      a: 'Yes. The course is designed mobile-first, so you can learn on the bus, in a queue, or anywhere else. Code examples run in your browser, not on a server.',
+    },
+    {
+      q: 'How is the course organized?',
+      a: 'There are 6 tracks from beginner to advanced. Each track is a sequence of modules and lessons, and every lesson has a short reading, runnable examples, a quiz and one or more graded exercises.',
+    },
+    {
+      q: 'Do I have to follow the tracks in order?',
+      a: 'No. Each lesson is usable on its own, but the tracks are arranged so the ideas build smoothly. If you are new to Python, starting at the top of a track is the easiest path.',
+    },
+    {
+      q: 'What is this built from?',
+      a: 'The curriculum is built from real Python books — Halterman, Sweigart, Klein, Moore and others — and structured into a 3-month path. Each lesson lists its source in the header.',
+    },
+    {
+      q: 'How do I keep my progress?',
+      a: 'If you sign in, your XP, lessons, streaks and certificates follow you to any browser. If you use PyLearn without an account, everything is saved in this browser only — use Settings → Export backup to keep a copy.',
+    },
+  ]
+}
+

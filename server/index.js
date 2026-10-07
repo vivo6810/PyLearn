@@ -30,6 +30,11 @@ const DIST_DIR = resolve(here, '..', 'dist')
 const PORT = Number(process.env.PORT) || 5184
 const COOKIE_SECURE = process.env.PYLEARN_COOKIE_SECURE === '1'
 
+// PyLearn is a plain-HTTP app; TLS is terminated by the edge/host in front of it
+// (Cloudflare, Render, etc.). The server trusts X-Forwarded-Proto only when the
+// request is already HTTPS — it never flips Secure on for plain HTTP.
+// See README.md § HTTPS.
+
 purgeExpiredSessions()
 const purgeTimer = setInterval(purgeExpiredSessions, 60 * 60 * 1000)
 purgeTimer.unref()

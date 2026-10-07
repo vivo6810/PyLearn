@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useApp } from '../state/AppContext'
 import { tracks } from '../curriculum'
 import { Certificate } from './Certificate'
+import { FAQ } from './FAQ'
 import { Icon } from './Icon'
 
 export function TrackView({ trackId, navigate }: { trackId: string; navigate: (v: string) => void }) {
@@ -76,6 +77,38 @@ export function TrackView({ trackId, navigate }: { trackId: string; navigate: (v
       ))}
 
       {openCert && <Certificate track={track} onClose={() => setOpenCert(false)} />}
+
+      <FAQ items={trackFaq(track)} />
     </div>
   )
 }
+
+function trackFaq(_track: typeof tracks[number]) {
+  return [
+    {
+      q: 'Do I have to finish the lessons in order?',
+      a: 'No. Each lesson is usable on its own, but the modules are ordered so the ideas build on each other. If you are new to Python, starting at the top of the track is the smoothest path.',
+    },
+    {
+      q: 'How long does a lesson take?',
+      a: 'Each lesson shows an approximate time in minutes. A lesson usually includes a short reading, a worked example you can run and edit, a quiz and one or more graded exercises.',
+    },
+    {
+      q: 'What happens when I mark a lesson complete?',
+      a: 'Your progress, quiz scores and exercise results are saved on this device and, if you are signed in, synced to your account. Completing a lesson also awards XP and can unlock achievements.',
+    },
+    {
+      q: 'Can I use this on my phone?',
+      a: 'Yes. The course is designed mobile-first, so you can learn on the bus, in a queue or anywhere else. Code examples run in your browser, so there is nothing to install.',
+    },
+    {
+      q: 'Where do the lessons come from?',
+      a: 'The curriculum is built from real Python books (Halterman, Sweigart, Klein and others) and structured into a 3-month path. Each lesson lists its source in the header.',
+    },
+    {
+      q: 'How do I get a certificate?',
+      a: 'Finish every lesson in a track. When you do, the track certificate appears on the track page and in Settings.',
+    },
+  ]
+}
+

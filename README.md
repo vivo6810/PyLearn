@@ -144,6 +144,26 @@ docker run -p 8080:8080 -v pylearn-data:/data pylearn
 Set `PYLEARN_COOKIE_SECURE=1` when serving over HTTPS if your host doesn't
 forward `X-Forwarded-Proto`.
 
+## HTTPS
+
+PyLearn itself doesn't terminate TLS — it's a plain HTTP server (the session
+cookie is marked `Secure` only when the request came in over HTTPS, via
+`X-Forwarded-Proto` or `PYLEARN_COOKIE_SECURE`). Put an HTTPS-terminating edge
+in front of it:
+
+- **Cloudflare (recommended):** proxy the hostname through Cloudflare and set
+  `Always Use HTTPS` + a Page Rule / edge rule that forces HTTPS. That also
+  gives you the Cloudflare Turnstile widget for the login page without running
+  your own challenge server.
+- **Render / any other host:** most platform-managed TLS does the same thing —
+  the platform terminates TLS and forwards plain HTTP to your container, sending
+  `X-Forwarded-Proto: https`. The server already reads that header, so the
+  `Secure` cookie flag comes out right.
+
+In short: run PyLearn over plain HTTP and let the edge/CDN do HTTPS. The app
+behaves the same either way; only the cookie flag depends on the edge telling
+the truth about the original request scheme.
+
 ## Notes
 
 - `source/` holds third-party course books used only to author the curriculum

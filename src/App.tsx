@@ -9,17 +9,20 @@ import { Reference } from './components/Reference'
 import { Settings } from './components/Settings'
 import { Landing } from './components/Landing'
 import { Auth } from './components/Auth'
+import { NotFound } from './components/NotFound'
 import { Icon } from './components/Icon'
 import { Logo } from './components/Logo'
 import { preloadPython } from './pyodide/runner'
+import { useHead } from './useHead'
 
-type View =
+export type View =
   | 'landing'
   | 'auth'
   | 'dashboard'
   | 'playground'
   | 'reference'
   | 'settings'
+  | 'not-found'
   | `track:${string}`
   | `lesson:${string}`
 
@@ -29,7 +32,7 @@ const PROTECTED = ['dashboard', 'reference', 'settings', 'playground', 'track', 
 function parseHash(): View {
   const h = location.hash.replace(/^#\/?/, '')
   if (h.startsWith('track:') || h.startsWith('lesson:')) return h as View
-  if (['landing', 'auth', 'dashboard', 'playground', 'reference', 'settings'].includes(h)) return h as View
+  if (['landing', 'auth', 'dashboard', 'playground', 'reference', 'settings', 'not-found'].includes(h)) return h as View
   // a returning learner with progress skips the landing page
   try {
     const p = JSON.parse(localStorage.getItem('pylearn.progress.v1') ?? '{}')
@@ -51,26 +54,32 @@ function Shell() {
   const [view, setView] = useState<View>(parseHash)
   const { theme, toggleTheme, toasts, auth, authReady, accountsEnabled, guest } = useApp()
 
+  function navigate(v: string) {
+    location.hash = '/' + v
+    setView(v as View)
+  }
+
+  useHead(view, auth?.name ?? null, navigate)
+
   useEffect(() => {
     const onHash = () => setView(parseHash())
     window.addEventListener('hashchange', onHash)
     return () => window.removeEventListener('hashchange', onHash)
   }, [])
 
-  function navigate(v: string) {
-    location.hash = '/' + v
-    setView(v as View)
-  }
-
-  // Signing in *from* the #/auth route has to leave that route behind, otherwise
-  // the gate would keep rendering on top of the signed-in app. The same applies
-  // to a static deploy with no accounts, where #/auth can never do anything.
+  // If the boot splash is still showing on reload but we already have a cached
+  // account, skip straight to the app so the splash can't get stuck.
   useEffect(() => {
-    if (!authReady || view !== 'auth') return
-    const target = auth ? 'dashboard' : accountsEnabled ? null : 'landing'
-    if (target) {
-      location.hash = '/' + target
-      setView(target)
+    if (!authReady) return
+    if (checkingSession) return
+    if (!auth && accountsEnabled && view === 'auth') {
+      // no cookie, no guest accept — show the sign-in form
+      return
+    }
+    if (authReady && auth && view === 'auth') {
+      // signed in while on the auth page (e.g. reload) — leave it behind
+      location.hash = '/dashboard'
+      setView('dashboard')
     }
   }, [auth, view, authReady, accountsEnabled])
 
@@ -144,6 +153,7 @@ function Shell() {
         {!showAuth && root === 'lesson' && (
           <LessonView key={view.split(':')[1]} id={view.split(':')[1]} navigate={navigate} />
         )}
+        {!showAuth && root === 'not-found' && <NotFound seed={view} navigate={navigate} />}
       </main>
 
       <nav className="tabbar" style={showAuth || root === 'landing' ? { display: 'none' } : undefined}>

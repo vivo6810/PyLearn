@@ -5,8 +5,11 @@ import { ApiError } from '../state/auth'
 import { guestHasProgress } from '../state/storage'
 import { Icon } from './Icon'
 import { Logo } from './Logo'
+import { useTurnstile, Turnstile } from './Turnstile'
 
 type Mode = 'signin' | 'signup'
+
+const TURNSTILE_SITE_KEY = (window as unknown as { __ENV?: { TURNSTILE_SITE_KEY?: string } }).__ENV?.TURNSTILE_SITE_KEY ?? '' // injected by the build
 
 export function Auth() {
   const { signIn, signUp, continueAsGuest } = useApp()
@@ -17,6 +20,7 @@ export function Auth() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  const turnstile = useTurnstile(TURNSTILE_SITE_KEY)
 
   // Adopting only applies when creating an account — signing in loads the
   // account's own saved progress instead.
@@ -26,6 +30,14 @@ export function Auth() {
   async function submit(event: FormEvent) {
     event.preventDefault()
     if (busy) return
+
+    // With Turnstile configured, require a valid token before calling the API.
+    // Without a key we intentionally skip the challenge so the app still works.
+    if (TURNSTILE_SITE_KEY && !turnstile.token) {
+      setError('Please complete the spam check before signing in.')
+      return
+    }
+
     setError(null)
     setBusy(true)
     try {
@@ -36,6 +48,9 @@ export function Auth() {
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Something went wrong. Please try again.')
       setBusy(false)
+    } finally {
+      // always reset the challenge token after an attempt so the next one is fresh
+      turnstile.refresh()
     }
   }
 
@@ -43,6 +58,7 @@ export function Auth() {
     if (busy) return
     setMode(next)
     setError(null)
+    turnstile.refresh()
   }
 
   return (
@@ -82,6 +98,16 @@ export function Auth() {
         </div>
 
         <form className="auth-form" onSubmit={submit} noValidate>
+          <Turnstile
+            siteKey={TURNSTILE_SITE_KEY}
+            onSuccess={(_token) => {
+              // consume the token and reset so the next attempt gets a fresh challenge
+              turnstile.refresh()
+            }}
+            onError={() => setError('Spam check failed — please try again.')}
+            size={isSignup ? 'compact' : 'normal'}
+          />
+
           {isSignup && (
             <label className="field">
               <span>
@@ -141,7 +167,7 @@ export function Auth() {
             </div>
           )}
 
-          <button className="btn primary big auth-submit" type="submit" disabled={busy}>
+          <button className="btn primary big auth-submit" type="submit" disabled={busy || (TURNSTILE_SITE_KEY ? !turnstile.token : false)}>
             <Icon name="lock" size={15} />
             {busy ? (isSignup ? 'Creating account…' : 'Signing in…') : isSignup ? 'Create account' : 'Sign in'}
           </button>

@@ -230,6 +230,13 @@ const PATHS: Record<string, ReactElement> = {
       <path d="M12 3v12" />
     </>
   ),
+  help: (
+    <>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+      <path d="M12 17h.01" />
+    </>
+  ),
   alert: (
     <>
       <path d="M12 3 2.5 20h19L12 3Z" />

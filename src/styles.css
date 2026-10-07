@@ -777,6 +777,165 @@ code, pre, .coderunner-out, .cm-editor .cm-scroller {
   .appear { animation: none !important; }
 }
 
+/* ─── 3D disc scene (landing) ────────────────────────────────────────────────
+   A tilted disc whose Y-axis tilt follows the mouse Y position. Track badges
+   orbit the rim. The whole thing stays inside the viewport, so nothing
+   ever flies off-screen, and the tilt is bounded to a readable range. */
+.disc-scene {
+  --d-radius: min(220px, 52vw);
+  position: relative;
+  height: min(340px, 62vw);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+.disc-caption {
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  text-align: center;
+  font-family: var(--font-hand-ui);
+}
+.disc-stage {
+  position: relative;
+  width: var(--d-radius);
+  height: var(--d-radius);
+  transform-style: preserve-3d;
+  /* Y tilt follows the mouse; a small fixed X tilt keeps the disc readable */
+  transform: perspective(900px) rotateX(var(--x-tilt, -8deg)) rotateY(var(--y-tilt, 0deg));
+  transition: transform 0.08s linear;
+  will-change: transform;
+}
+.disc-guide {
+  position: absolute;
+  inset: 6%;
+  border-radius: 50%;
+  border: 2px dashed color-mix(in srgb, var(--ink) 22%, transparent);
+  transform: rotateX(90deg) translateZ(4px);
+  pointer-events: none;
+}
+.disc-hub {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  transform: translateZ(26px);
+  filter: drop-shadow(0 0 14px color-mix(in srgb, var(--accent) 25%, transparent));
+}
+.disc-ring {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+.disc-badge {
+  position: absolute;
+  top: calc(50% + var(--y));
+  left: calc(50% + var(--x));
+  width: 64px;
+  transform: translate(-50%, -50%) translateZ(20px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  pointer-events: none;
+  backface-visibility: hidden;
+}
+.disc-badge-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--bg) 80%, transparent);
+  border: 2px solid var(--c);
+  transform: rotateX(40deg);
+  transition: transform 0.12s ease;
+}
+.disc-badge-title {
+  font-family: var(--font-hand-ui);
+  font-size: 0.72rem;
+  color: var(--text);
+  text-align: center;
+  max-width: 70px;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transform: rotateX(40deg);
+  margin-top: 2px;
+}
+
+@media (max-width: 620px) {
+  .disc-badge { width: 52px; }
+  .disc-badge-label { width: 28px; height: 28px; }
+  .disc-badge-label .icon { width: 14px; height: 14px; }
+  .disc-badge-title { font-size: 0.62rem; }
+  .disc-caption { font-size: 0.72rem; }
+}
+
+/* ─── 404 page ─────────────────────────────────────────────────────────────── */
+.not-found { max-width: 640px; margin: 0 auto; padding: 30px 16px; text-align: center; }
+.not-found-code {
+  font-family: var(--font-hand);
+  font-size: clamp(4rem, 14vw, 7rem);
+  line-height: 0.9;
+  color: var(--muted);
+  letter-spacing: -0.04em;
+  margin-bottom: 6px;
+}
+.not-found h1 { font-size: clamp(2rem, 6vw, 2.8rem); margin: 0 0 10px; }
+.not-found .muted { margin: 0 0 14px; }
+.not-found-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin: 18px 0; }
+.not-found-suggest { background: var(--card); border: 2px solid var(--ink); border-radius: 14px 6px 15px 7px / 7px 14px 6px 15px; padding: 14px; box-shadow: 3px 3px 0 var(--shadow-ink); margin: 18px 0; }
+.not-found-tracks { margin-top: 24px; }
+.not-found-track-list { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.not-found-track {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--card); border: 2px solid var(--ink);
+  border-radius: 12px 5px 13px 6px / 6px 12px 5px 13px;
+  padding: 7px 12px; cursor: pointer; color: var(--text);
+  font-family: var(--font-hand-ui); font-size: 0.92rem;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+.not-found-track:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--shadow-ink); }
+.not-found-track-icon { display: inline-flex; }
+.not-found-meta { margin-top: 22px; font-size: 0.82rem; }
+
+/* ─── FAQ accordion ─────────────────────────────────────────────────────────── */
+.faq { margin: 28px 0 40px; }
+.faq.center { max-width: 760px; margin-left: auto; margin-right: auto; }
+
+/* ─── landing FAQ section ───────────────────────────────────────────────────── */
+.landing-faq { max-width: 1060px; margin: 0 auto; padding: 80px 18px 100px; }
+.faq-title { font-size: 1.6rem; margin: 0 0 4px; display: flex; align-items: center; gap: 9px; }
+.faq-title .icon { color: var(--warn); }
+.faq-sub { color: var(--muted); margin: 0 0 14px; font-size: 0.88rem; }
+.faq-list { display: flex; flex-direction: column; gap: 10px; }
+.faq-item { background: var(--card); border: 2px solid var(--ink); border-radius: 14px 6px 15px 7px / 7px 14px 6px 15px; box-shadow: 3px 3px 0 var(--shadow-ink); overflow: hidden; }
+.faq-q {
+  width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  background: none; border: 0; color: var(--text); cursor: pointer; text-align: left;
+  padding: 12px 14px; font: inherit; font-family: var(--font-hand-ui); font-size: 1rem;
+  transition: background 0.15s ease;
+}
+.faq-q:hover { background: var(--card2); }
+.faq-q-row { display: flex; align-items: center; gap: 10px; width: 100%; }
+.faq-q-title { flex: 1; }
+.faq-q-icon { display: inline-flex; align-items: center; color: var(--muted); transition: transform 0.3s ease, color 0.15s ease; }
+.faq-q--open .faq-q-icon { color: var(--warn); transform: rotate(135deg); }
+.faq-a-wrap { height: 0; }
+.faq-a { padding: 0 14px 14px; color: var(--muted); font-size: 0.92rem; line-height: 1.6; }
+.faq-a p { margin: 0 0 10px; }
+.faq-a p:last-child { margin-bottom: 0; }
+.faq-a ul { margin: 6px 0 10px; padding-left: 20px; }
+.faq-a li { margin-bottom: 4px; }
+.faq-a code { background: var(--card2); border: 1px solid var(--border); padding: 1px 5px; border-radius: 5px; font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 0.85em; }
+
 /* ─── Account & auth ───────────────────────────────────────────────────────── */
 
 /* Brief splash while the session cookie is checked on boot. */
