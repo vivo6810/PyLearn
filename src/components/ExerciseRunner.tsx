@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import CodeMirror from '@uiw/react-codemirror'
 import { python } from '@codemirror/lang-python'
 import { runPython, isPythonReady, onPythonReady } from '../pyodide/runner'
@@ -25,11 +25,15 @@ export function ExerciseRunner({ lessonId, index, exercise, onPassed }: Props) {
   const [hint, setHint] = useState(false)
   const [passed, setPassed] = useState(false)
   const [ready, setReady] = useState(isPythonReady())
+  const latestRef = useRef<string | null>(null)
   const [stdin, setStdin] = useState('')
 
   useEffect(() => {
     const saved = getDraft(draftKey)
-    if (saved !== undefined) setCode(saved)
+    if (saved !== undefined) {
+      setCode(saved)
+      latestRef.current = saved
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -53,8 +57,10 @@ export function ExerciseRunner({ lessonId, index, exercise, onPassed }: Props) {
       setPassed(true)
       recordExercisePass(lessonId, index)
       onPassed()
+      setBusy(false)
+    } else {
+      setBusy(false)
     }
-    setBusy(false)
   }
 
   async function runOnly() {
@@ -93,8 +99,12 @@ export function ExerciseRunner({ lessonId, index, exercise, onPassed }: Props) {
           <label htmlFor={`stdin-${draftKey}-ex`}>{exercise.stdinHint}</label>
           <textarea
             id={`stdin-${draftKey}-ex`}
-            value={stdin}
-            onChange={(e) => setStdin(e.target.value)}
+            value={latestRef.current ?? ''}
+            onChange={(e) => {
+              const v = e.target.value
+              latestRef.current = v
+              setStdin(v)
+            }}
             rows={3}
             placeholder={'3\n7\n2\n…'}
             spellCheck={false}

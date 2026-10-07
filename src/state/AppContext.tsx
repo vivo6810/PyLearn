@@ -107,9 +107,10 @@ export function AppProvider({ tracks, children }: { tracks: Track[]; children: R
     setProgress((p) => {
       const next = { ...p, theme: p.theme === 'dark' ? ('light' as const) : ('dark' as const) }
       saveProgress(next)
+      pushRemoteProgress(next).catch(() => { /* offline */ })
       return next
     })
-  }, [])
+  }, [pushRemoteProgress])
 
   // ── streak bookkeeping on mount ──
   useEffect(() => {
@@ -276,13 +277,24 @@ export function AppProvider({ tracks, children }: { tracks: Track[]; children: R
   const recordQuiz = useCallback(
     (id: string, score: number, total: number) => {
       const ratio = total > 0 ? score / total : 0
-      const gained = score === total ? XP.quizPerfect : ratio >= 0.6 ? XP.quizPass : 0
-      mutate((p) => {
-        const lp = p.lessons[id] ?? { completed: false }
-        const best = Math.max(lp.quizScore ?? 0, ratio)
-        return { ...p, lessons: { ...p.lessons, [id]: { ...lp, quizScore: best } }, xp: p.xp + gained }
+      // Award XP only on the *first time* a learner reaches this score tier for this
+      // quiz. Re-takes earn nothing for a tier already banked, so hitting "Score my quiz"
+      // repeatedly never pays out twice.
+      const prevBest = (p: ProgressState) => (p.lessons[id]?.quizScore ?? 0)
+
+      mutate((p: ProgressState) => {
+        const currentBest = prevBest(p)
+        const newBest = Math.max(currentBest, ratio)
+        const gained = newBest > currentBest
+          ? (ratio >= 1 ? XP.quizPerfect : ratio >= 0.6 ? XP.quizPass : 0)
+          : 0
+        return {
+          ...p,
+          lessons: { ...p.lessons, [id]: { ...p.lessons[id], quizScore: newBest } },
+          xp: p.xp + gained,
+        }
       })
-      if (score === total) pushToast(`Perfect quiz! +${XP.quizPerfect} XP`, 'brain')
+      if (ratio >= 1) pushToast(`Perfect quiz! +${XP.quizPerfect} XP`, 'brain')
     },
     [mutate, pushToast],
   )
@@ -361,7 +373,7 @@ export function AppProvider({ tracks, children }: { tracks: Track[]; children: R
     const have = new Set(progress.achievements)
     const add: string[] = []
     const doneCount = allLessons.filter((l) => progress.lessons[l.id]?.completed).length
-    const perfectQuizzes = Object.values(progress.lessons).filter((l) => (l.quizScore ?? 0) >= 1).length
+    const perfectQuizzes = Object.values(progress.lessons).filter((l) => ((l.quizScore ?? 0) - 1) > -1e-9 && ((l.quizScore ?? 0) - 1) < 1e-9).length
 
     if (progress.streak >= 3 && !have.has('streak-3')) add.push('streak-3')
     if (progress.streak >= 7 && !have.has('streak-7')) add.push('streak-7')

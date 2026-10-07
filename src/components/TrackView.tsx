@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useApp } from '../state/AppContext'
 import { tracks } from '../curriculum'
 import { Certificate } from './Certificate'
@@ -16,6 +16,11 @@ export function TrackView({ trackId, navigate }: { trackId: string; navigate: (v
       </div>
     )
   }
+
+  useEffect(() => {
+    if (openCert) setOpenCert(false)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [trackId])
   const lessons = track.modules.flatMap((m) => m.lessons)
   const done = lessons.filter((l) => lessonCompleted(l.id)).length
   const allDone = lessons.length > 0 && done === lessons.length

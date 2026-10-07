@@ -9,12 +9,14 @@ export function QuizCard({ lessonId, questions }: { lessonId: string; questions:
   const [checked, setChecked] = useState<Record<number, boolean>>({})
   const [finished, setFinished] = useState(false)
 
-  // restore half-answered quiz from the session store
+  // reset the UI when the learner opens a different quiz
   useEffect(() => {
+    setPicked({})
+    setChecked({})
+    setFinished(false)
     const draft = getQuizDraft(lessonId)
-    if (draft && Object.keys(draft).length > 0) {
-      setPicked(draft)
-      setChecked(Object.fromEntries(Object.keys(draft).map((k) => [Number(k), true])))
+    if (draft && typeof draft === 'object') {
+      setPicked({ ...draft } as Record<number, number>)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lessonId])
@@ -45,8 +47,11 @@ export function QuizCard({ lessonId, questions }: { lessonId: string; questions:
     clearQuizDraft(lessonId)
   }
 
-  const score = questions.reduce((acc, q, qi) => acc + (picked[qi] === q.answer ? 1 : 0), 0)
-  const perfect = score === questions.length
+  // use the local draft for the live score (answers are confirmed on finish only)
+  const score = Object.keys(picked).length
+    ? questions.reduce((acc, q, qi) => acc + (picked[qi] === q.answer ? 1 : 0), 0)
+    : 0
+  const perfect = questions.length > 0 && score === questions.length
 
   return (
     <div className="quiz">
@@ -98,11 +103,13 @@ export function QuizCard({ lessonId, questions }: { lessonId: string; questions:
         <div className={'quiz-result ' + (perfect ? 'perfect' : '')}>
           <strong>
             {score} / {questions.length}{' '}
-            {perfect ? '— perfect!' : score >= questions.length / 2 ? '— nice' : '— review and retry'}
+            {perfect ? '— perfect!' : score >= Math.ceil(questions.length / 2) ? '— nice' : '— review and retry'}
           </strong>
-          <button className="btn ghost" onClick={retake}>
-            <Icon name="rotate" size={14} /> Retake
-          </button>
+          {score < questions.length && (
+            <button className="btn ghost" onClick={retake}>
+              <Icon name="rotate" size={14} /> Retry
+            </button>
+          )}
         </div>
       )}
     </div>

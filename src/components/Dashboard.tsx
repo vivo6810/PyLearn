@@ -67,7 +67,8 @@ export function Dashboard({ navigate }: { navigate: (v: string) => void }) {
   const pct = allLessons.length ? Math.round((doneCount / allLessons.length) * 100) : 0
   const { level, into, need } = levelFromXp(progress.xp)
 
-  const resume = session.lastLesson ? findLesson(session.lastLesson) : null
+  const resumeRaw = session.lastLesson ?? null
+  const resume = resumeRaw ? findLesson(resumeRaw) : null
   const resumedDone = resume ? doneIds.has(resume.lesson.id) : false
 
   const hoursLeft = Math.max(0, Math.round((totalMinutes - doneMinutes) / 60))
@@ -122,7 +123,7 @@ export function Dashboard({ navigate }: { navigate: (v: string) => void }) {
           </span>
           <span className="stat-sub">day streak</span>
           <span className="stat-ach-cta">
-            <Icon name="medal" size={14} /> {progress.achievements.length} achievements
+            <Icon name="medal" size={14} /> {progress.achievements.length} {progress.achievements.length === 1 ? 'achievement' : 'achievements'}
           </span>
         </button>
         <div className="stat">
