@@ -878,6 +878,16 @@ code, pre, .coderunner-out, .cm-editor .cm-scroller {
   .disc-caption { font-size: 0.72rem; }
 }
 
+.disc-caption-emphasis {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-family: var(--font-hand-ui);
+  text-align: center;
+}
+
 /* ─── 404 page ─────────────────────────────────────────────────────────────── */
 .not-found { max-width: 640px; margin: 0 auto; padding: 30px 16px; text-align: center; }
 .not-found-code {

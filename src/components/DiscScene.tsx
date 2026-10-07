@@ -113,6 +113,9 @@ export function DiscScene() {
       <div className="disc-caption">
         <span>Move your mouse up and down — the disc tilts with it.</span>
       </div>
+
+      {/* visual fix: caption emphasis */}
+      <p className="disc-caption-emphasis">six tracks orbiting one disc</p>
     </div>
   )
 }
