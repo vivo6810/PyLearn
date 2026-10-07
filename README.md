@@ -5,9 +5,9 @@ the browser via Pyodide. 35 lessons across 6 tracks, quizzes, hidden-test
 exercises, XP, achievements and certificates.
 
 **Live site: https://vivo6810.github.io/** — deployed from `main` by
-GitHub Actions on every push (built with `VITE_BASE=/`). The same build also
-serves the project site at https://vivo6810.github.io/PyLearn/ from the PyLearn
-repository.
+GitHub Actions on every push (built with `VITE_BASE=/`). The old project URL,
+https://vivo6810.github.io/PyLearn/, redirects to the root site and preserves
+hash-based lesson links.
 
 ## Guest mode (GitHub Pages)
 
@@ -111,12 +111,13 @@ per-process in memory.
 ### GitHub Pages (current — guest mode)
 
 Automatic: push to `main` and the workflow in
-`.github/workflows/deploy-pages.yml` builds the site and publishes it.
+`.github/workflows/deploy-pages.yml` builds the site. The `vivo6810.github.io`
+repository publishes the app at the root URL; the `PyLearn` repository
+publishes a redirect from the old `/PyLearn/` URL.
 
 One-time setup, if not enabled yet: repository **Settings → Pages →
 Build and deployment → Source: “GitHub Actions”**. After that, every push
-deploys. The site is served from `/PyLearn/`, which the build handles via
-`VITE_BASE`.
+deploys automatically. The root build uses `VITE_BASE=/`.
 
 ### Deploying with accounts
 

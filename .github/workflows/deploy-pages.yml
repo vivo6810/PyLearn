@@ -43,9 +43,23 @@ jobs:
           VITE_BASE: ${{ github.event.repository.name == 'PyLearn' && '/PyLearn/' || '/' }}
 
       - uses: actions/configure-pages@v5
+
+      - name: Prepare legacy URL redirect
+        if: github.event.repository.name == 'PyLearn'
+        run: |
+          mkdir -p legacy-site
+          cp public/legacy-redirect.html legacy-site/index.html
+          cp public/legacy-redirect.html legacy-site/404.html
+
       - uses: actions/upload-pages-artifact@v3
+        if: github.event.repository.name != 'PyLearn'
         with:
           path: dist
+
+      - uses: actions/upload-pages-artifact@v3
+        if: github.event.repository.name == 'PyLearn'
+        with:
+          path: legacy-site
 
   deploy:
     needs: build
