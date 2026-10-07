@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, forwardRef, useEffect, useImperativeHandle, useState } from 'react'
 import CodeMirror from '@uiw/react-codemirror'
 import { python } from '@codemirror/lang-python'
 import { runPython, isPythonReady, onPythonReady } from '../pyodide/runner'
@@ -18,11 +18,11 @@ interface Props {
   /** shown above the stdin box (e.g. "answers: 3, then names") */
   stdinHint?: string
 }
-
-export function CodeRunner({
-  initialCode,
-  draftKey,
-  minHeight = 140,
+export const CodeRunner = forwardRef<{ getCode: () => string }, Props>(
+  function CodeRunner({
+    initialCode,
+    draftKey,
+    minHeight = 140,
   compact = false,
   onOutput,
   disabled = false,
@@ -30,9 +30,15 @@ export function CodeRunner({
   timeoutMs,
   readOnly = false,
   stdinHint,
-}: Props) {
+}: Props, ref) {
   const { theme, getDraft, setDraft } = useApp()
   const [code, setCode] = useState(initialCode)
+
+  // playground calls runnerRef.current.getCode() to download the current code
+  const getCode = useCallback(() => code, [code])
+  useImperativeHandle(ref, () => ({
+    getCode,
+  }), [getCode])
   const [output, setOutput] = useState<string | null>(null)
   const [plots, setPlots] = useState<string[]>([])
   const [running, setRunning] = useState(false)
@@ -100,9 +106,12 @@ export function CodeRunner({
         <div className="coderunner-plots">
           {plots.map((p, i) => (
             <img key={i} src={`data:image/png;base64,${p}`} alt={`Plot ${i + 1}`} />
-          ))}
-        </div>
-      )}
+          ))}    </div>
+  )
+}
+)
+
+
       {!readOnly && (
         <div className="stdin-box">
           <label htmlFor={`stdin-${draftKey ?? 'run'}`}>
@@ -112,12 +121,34 @@ export function CodeRunner({
             id={`stdin-${draftKey ?? 'run'}`}
             value={stdin}
             onChange={(e) => setStdin(e.target.value)}
-            placeholder={'Alice\n25\n…' }
-            rows={2}
+            placeholder={'Alice\n25\n…'}
+            rows={3}
             spellCheck={false}
-          />
-        </div>
-      )}
+          />    </div>
+  )
+}
+)
+
+
+      {/* expose code for the parent to export / copy, but only when the runner has
+          real code of its own to offer (not a read-only shell re-run). */}
+      <button
+        className="btn ghost"
+        onClick={() => {
+          const blob = new Blob([getCode()], { type: 'text/x-python' })
+          const url = URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = `playground-${new Date().toISOString().slice(0, 10)}.py`
+          a.click()
+          URL.revokeObjectURL(url)
+        }}
+        disabled={readOnly || running}
+        title="Download as .py"
+      >
+        <Icon name="download" size={14} /> Export .py
+      </button>
     </div>
   )
 }
+)
