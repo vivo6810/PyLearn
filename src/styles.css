@@ -553,12 +553,19 @@ code, pre, .coderunner-out, .cm-editor .cm-scroller {
   margin: 0 0 18px;
   letter-spacing: 0;
 }
-.hero-sub { color: var(--muted); max-width: 620px; font-size: 1.05rem; margin: 0 0 26px; }
+.hero-sub { color: var(--muted); max-width: min(620px, 92vw); font-size: 1.05rem; margin: 0 0 26px; }
 .hero-cta { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
 .hero-stats { display: flex; gap: 34px; margin-top: 54px; flex-wrap: wrap; justify-content: center; }
 .hstat { display: flex; flex-direction: column; align-items: center; }
 .hstat strong { font-size: 2.1rem; }
 .hstat span { color: var(--muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+@media (max-width: 560px) {
+  .hero-sub { max-width: 92vw; }
+  .hero-cta { flex-direction: column; align-items: stretch; gap: 8px; }
+  .hero-stats { gap: 18px; margin-top: 36px; }
+  .hstat strong { font-size: 1.9rem; }
+  .hero-title { font-size: clamp(2.9rem, 10vw, 4.2rem); }
+}
 
 /* ── exploded program section ── */
 .xp-section { padding-top: 40px; }
