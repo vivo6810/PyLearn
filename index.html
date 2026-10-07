@@ -5,6 +5,25 @@
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#14120e" />
+    <meta
+      name="description"
+      content="PyLearn is a free, mobile-first Python course: 35 lessons from beginner to advanced with quizzes, graded exercises and real Python running right in your browser — no installs, no setup."
+    />
+    <link rel="canonical" href="https://vivo6810.github.io/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://vivo6810.github.io/" />
+    <meta property="og:title" content="PyLearn — Master Python" />
+    <meta
+      property="og:description"
+      content="35 lessons across 6 tracks, quizzes, hidden-test exercises, XP and certificates — real Python running in your browser."
+    />
+    <meta property="og:image" content="https://vivo6810.github.io/favicon.png" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="PyLearn — Master Python" />
+    <meta
+      name="twitter:description"
+      content="35 lessons across 6 tracks, quizzes, hidden-test exercises, XP and certificates — real Python running in your browser."
+    />
     <title>PyLearn — Master Python</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -14,7 +33,27 @@
     />
   </head>
   <body>
-    <div id="root"></div>
+    <!-- Static first paint: crawlers and no-JS visitors get a real welcome here;
+         React replaces this block entirely on mount (createRoot clears #root). -->
+    <div id="root">
+      <div class="boot" role="main">
+        <img src="/favicon.png" alt="PyLearn" width="86" height="91" style="transform: rotate(-3deg)" />
+        <h1 style="font-size: 2.4rem; margin: 4px 0 10px">Learn Python by breaking it apart</h1>
+        <p class="muted" style="max-width: 620px; text-align: center; margin: 0 0 14px">
+          Welcome to <strong>PyLearn</strong> — a free, mobile-first Python course that runs
+          real Python right in your browser. <strong>35 lessons across 6 tracks</strong>, from
+          your first <code>print()</code> through functions, classes, regular expressions,
+          NumPy &amp; Pandas data analysis, desktop GUIs and web scraping. Every lesson has
+          runnable examples, a quiz and a graded exercise with hidden tests — plus XP,
+          achievements and certificates. No installs, no setup: press <b>Run</b> and the
+          code executes.
+        </p>
+        <p class="muted" style="font-size: 0.85rem; max-width: 520px; text-align: center">
+          This app needs JavaScript to run its interactive lessons — enable it and reload
+          to start learning.
+        </p>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
