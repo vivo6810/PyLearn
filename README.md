@@ -4,8 +4,10 @@ A mobile-first Python course — beginner to advanced — that runs real Python 
 the browser via Pyodide. 35 lessons across 6 tracks, quizzes, hidden-test
 exercises, XP, achievements and certificates.
 
-**Live site: https://vivo6810.github.io/PyLearn/** — deployed from `main` by
-GitHub Actions on every push.
+**Live site: https://vivo6810.github.io/** — deployed from `main` by
+GitHub Actions on every push (built with `VITE_BASE=/`). The same build also
+serves the project site at https://vivo6810.github.io/PyLearn/ from the PyLearn
+repository.
 
 ## Guest mode (GitHub Pages)
 
