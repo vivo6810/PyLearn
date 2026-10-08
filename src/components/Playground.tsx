@@ -13,7 +13,7 @@ export function Playground({ navigate }: { navigate: (v: string) => void }) {
       <p>A free scratchpad — your code is saved automatically on this device.</p>
       <CodeRunner
         ref={runnerRef}
-        initialCode={`# Play with Python here — try anything!\nprint("Hello from the playground!")\n\nfor i in range(1, 6):\n    print("*" * i)`}
+        initialCode={`# Write any Python here, then press Run\nprint("Hello from the playground!")\n\nfor i in range(1, 6):\n    print("*" * i)`}
         draftKey="playground"
         minHeight={340}
       />

@@ -3,8 +3,6 @@ import { Icon } from './Icon'
 import logoUrl from '../assets/logo.png'
 import { tracks } from '../curriculum'
 
-const hubLogo = logoUrl
-
 /** Existing images / badges that orbit the disc. We reuse the track icon set
     so no new image assets are required. */
 const ORBIT_ITEMS = tracks.map((t) => ({
@@ -83,7 +81,7 @@ export function DiscScene() {
         {/* central hub */}
         <div className="disc-hub" aria-hidden="true">
           <img
-            src={hubLogo}
+            src={logoUrl}
             alt=""
             className="disc-hub-logo"
             draggable={false}
@@ -105,7 +103,7 @@ export function DiscScene() {
                 } as React.CSSProperties}
               >
                 <span className="disc-badge-label" style={{ color: item.accent }}>
-                  <Icon name={item.icon} size={18} />
+                  <Icon name={item.icon} size={26} />
                 </span>
                 <span className="disc-badge-title">{item.label}</span>
               </div>
@@ -117,13 +115,6 @@ export function DiscScene() {
         <div className="disc-guide" aria-hidden="true" />
       </div>
 
-      {/* caption: the disc reacts to where your mouse is on the Y axis */}
-      <div className="disc-caption">
-        <span>Move your mouse up and down — the disc tilts with it.</span>
-      </div>
-
-      {/* visual fix: caption emphasis */}
-      <p className="disc-caption-emphasis">six tracks orbiting one disc</p>
     </div>
   )
 }

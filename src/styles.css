@@ -782,21 +782,14 @@ code, pre, .coderunner-out, .cm-editor .cm-scroller {
    orbit the rim. The whole thing stays inside the viewport, so nothing
    ever flies off-screen, and the tilt is bounded to a readable range. */
 .disc-scene {
-  --d-radius: min(220px, 52vw);
+  --d-radius: min(300px, 68vw);
   position: relative;
-  height: min(340px, 62vw);
+  height: min(460px, 84vw);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   user-select: none;
-}
-.disc-caption {
-  margin-top: 14px;
-  color: var(--muted);
-  font-size: 0.82rem;
-  text-align: center;
-  font-family: var(--font-hand-ui);
 }
 .disc-stage {
   position: relative;
@@ -828,7 +821,7 @@ code, pre, .coderunner-out, .cm-editor .cm-scroller {
 }
 
 .disc-hub-logo {
-  width: clamp(64px, 16vw, 110px);
+  width: clamp(80px, 20vw, 140px);
   height: auto;
 }
 .disc-ring {
@@ -840,7 +833,7 @@ code, pre, .coderunner-out, .cm-editor .cm-scroller {
   position: absolute;
   top: calc(50% + var(--y));
   left: calc(50% + var(--x));
-  width: 64px;
+  width: 92px;
   transform: translate(-50%, -50%) translateZ(20px);
   display: flex;
   flex-direction: column;
@@ -853,8 +846,8 @@ code, pre, .coderunner-out, .cm-editor .cm-scroller {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background: color-mix(in srgb, var(--bg) 80%, transparent);
   border: 2px solid var(--c);
@@ -863,10 +856,10 @@ code, pre, .coderunner-out, .cm-editor .cm-scroller {
 }
 .disc-badge-title {
   font-family: var(--font-hand-ui);
-  font-size: 0.72rem;
+  font-size: 0.95rem;
   color: var(--text);
   text-align: center;
-  max-width: 70px;
+  max-width: 110px;
   line-height: 1.1;
   white-space: nowrap;
   overflow: hidden;
@@ -876,23 +869,13 @@ code, pre, .coderunner-out, .cm-editor .cm-scroller {
 }
 
 @media (max-width: 620px) {
-  .disc-badge { width: 52px; }
-  .disc-badge-label { width: 28px; height: 28px; }
-  .disc-badge-label .icon { width: 14px; height: 14px; }
-  .disc-badge-title { font-size: 0.62rem; }
-  .disc-caption { font-size: 0.72rem; }
-  .disc-hub-logo { width: 64px; }
+  .disc-badge { width: 74px; }
+  .disc-badge-label { width: 38px; height: 38px; }
+  .disc-badge-label .icon { width: 18px; height: 18px; }
+  .disc-badge-title { font-size: 0.8rem; }
+  .disc-hub-logo { width: 84px; }
 }
 
-.disc-caption-emphasis {
-  margin-top: 6px;
-  color: var(--muted);
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  font-family: var(--font-hand-ui);
-  text-align: center;
-}
 
 /* ─── 404 page ─────────────────────────────────────────────────────────────── */
 .not-found { max-width: 640px; margin: 0 auto; padding: 30px 16px; text-align: center; }

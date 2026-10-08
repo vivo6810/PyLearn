@@ -60,7 +60,7 @@ export function Landing({ navigate, onStart }: { navigate: (v: string) => void; 
           <Appear variant="soft" delay={0.42}>
             <p className="hero-sub">
               {allLessons.length} deep lessons · ~{Math.round(totalMinutes / 60)} hours · real Python running in your
-              browser. No installs, no setup — move your mouse to tilt the disc below.
+              browser. No installs, no setup.
             </p>
           </Appear>
           <Appear variant="btn" delay={0.55}>
@@ -98,7 +98,7 @@ export function Landing({ navigate, onStart }: { navigate: (v: string) => void; 
           </h2>
         </Reveal>
         <Reveal delay={100}>
-          <p className="xp-sub">Move your mouse up and down — the disc tilts with it.</p>
+          <p className="xp-sub">Hover the disc — it tilts with you.</p>
         </Reveal>
         <DiscScene />
       </section>
@@ -115,7 +115,7 @@ export function Landing({ navigate, onStart }: { navigate: (v: string) => void; 
             { icon: 'save', title: 'Sessions that survive', text: 'Half-finished quizzes, edited examples, notes and drafts — all saved. Close the tab, resume tomorrow.' },
             { icon: 'medal', title: 'XP, streaks & certificates', text: 'Levels, achievements and a printable certificate for every completed track.' },
             { icon: 'book', title: 'Built from real books', text: 'Halterman, Sweigart, Klein, Moore — your PDF library, structured into a 3-month path.' },
-            { icon: 'phone', title: 'Made for your pocket', text: 'Phone-first design: learn in the queue, on the bus, wherever life finds you.' },
+            { icon: 'phone', title: 'Runs on your phone', text: 'Phone-first design: full lessons and runnable code, wherever you are.' },
           ].map((f, i) => (
             <Reveal key={f.title} delay={i * 70}>
               <div className="feat">
@@ -154,7 +154,7 @@ export function Landing({ navigate, onStart }: { navigate: (v: string) => void; 
         <div className="landing-cta-final">
           <Reveal>
             <button className="btn primary big" onClick={onStart}>
-              Begin the journey →
+              Start learning →
             </button>
           </Reveal>
         </div>
@@ -184,7 +184,7 @@ function landingFaq() {
     },
     {
       q: 'Can I use PyLearn on my phone?',
-      a: 'Yes. The course is designed mobile-first, so you can learn on the bus, in a queue, or anywhere else. Code examples run in your browser, not on a server.',
+      a: 'Yes. The course is mobile-first, and code examples run in your browser, not on a server.',
     },
     {
       q: 'How is the course organized?',
