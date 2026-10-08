@@ -800,14 +800,6 @@ code, pre, .coderunner-out, .cm-editor .cm-scroller {
   transform: perspective(900px) rotateX(-8deg);
   will-change: transform;
 }
-.disc-guide {
-  position: absolute;
-  inset: 6%;
-  border-radius: 50%;
-  border: 2px dashed color-mix(in srgb, var(--ink) 22%, transparent);
-  transform: rotateX(90deg) translateZ(4px);
-  pointer-events: none;
-}
 .disc-hub {
   position: absolute;
   inset: 0;

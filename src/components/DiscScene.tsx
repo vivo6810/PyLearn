@@ -129,9 +129,6 @@ export function DiscScene() {
             )
           })}
         </div>
-
-        {/* subtle guide ring */}
-        <div className="disc-guide" aria-hidden="true" />
       </div>
     </div>
   )
