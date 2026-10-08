@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { Icon } from './Icon'
 import logoUrl from '../assets/logo.png'
 import { tracks } from '../curriculum'
@@ -12,6 +12,7 @@ const ORBIT_ITEMS = tracks.map((t) => ({
 }))
 
 const RADIUS_PCT = 42 // percent of disc diameter
+const MAX_TILT = 13 // degrees either way
 
 type Point = { x: number; y: number }
 
@@ -29,55 +30,73 @@ function orbitPoints(count: number): Point[] {
 
 export function DiscScene() {
   const discRef = useRef<HTMLDivElement>(null)
-  const [mouseY, setMouseY] = useState(0.5) // 0 = top of viewport, 1 = bottom
-  const [inside, setInside] = useState(true)
   const points = useMemo(() => orbitPoints(ORBIT_ITEMS.length), [])
 
+  // Y-tilt follows the mouse. The stage rect is re-measured on every move so
+  // scrolling never leaves the mapping stale (the old one-shot measurement is
+  // what made the tilt "stick" at an edge). The transform is written directly
+  // to the element from a rAF loop — no React re-render per mousemove, and the
+  // pointer eases toward the target so the motion glides instead of snapping.
   useEffect(() => {
-    if (!discRef.current) return
+    const el = discRef.current
+    if (!el) return
 
-    const stage = discRef.current.getBoundingClientRect()
-    const cy = stage.top + stage.height / 2
-    const half = stage.height / 2
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    let targetY = 0.5 // 0 = top of the stage, 1 = bottom
+    let currentY = 0.5
+    let raf = 0
+    let running = false
+    let queuedMove = false
+
+    function apply() {
+      currentY += (targetY - currentY) * 0.22
+      const deg = (currentY - 0.5) * 2 * MAX_TILT
+      el!.style.transform = `perspective(900px) rotateX(-8deg) rotateY(${deg.toFixed(3)}deg)`
+      if (queuedMove || Math.abs(targetY - currentY) > 0.001) {
+        queuedMove = false
+        raf = requestAnimationFrame(apply)
+      } else {
+        running = false
+      }
+    }
+
+    function wake() {
+      if (!running) {
+        running = true
+        raf = requestAnimationFrame(apply)
+      }
+    }
 
     const onMove = (e: MouseEvent) => {
-      const y = e.clientY
-      // normalize so top edge → 0, bottom edge → 1; outside the stage we let
-      // it keep its last value (no jump when the pointer leaves the stage).
-      setMouseY(Math.max(0, Math.min(1, (y - (cy - half)) / (half * 2))))
-      setInside(true)
+      const r = el!.getBoundingClientRect()
+      if (r.height < 1) return
+      targetY = Math.max(0, Math.min(1, (e.clientY - r.top) / r.height))
+      queuedMove = true
+      wake()
     }
-    const onLeave = () => setInside(false)
 
-    window.addEventListener('mousemove', onMove)
-    discRef.current.addEventListener('mouseleave', onLeave)
+    const onLeave = () => {
+      targetY = 0.5
+      queuedMove = true
+      wake()
+    }
+
+    if (!reduceMotion) {
+      window.addEventListener('mousemove', onMove, { passive: true })
+      el.addEventListener('mouseleave', onLeave)
+    }
+
     return () => {
+      cancelAnimationFrame(raf)
       window.removeEventListener('mousemove', onMove)
-      discRef.current?.removeEventListener('mouseleave', onLeave)
+      el.removeEventListener('mouseleave', onLeave)
     }
   }, [])
 
-  // Y-tilt: center position (0.5) → tilt 0; top (0) → tilted up, bottom (1) → tilted down.
-  // Map to a modest angle range so the disc never tips past readability.
-  const yTiltDeg = useMemo(() => {
-    const n = inside ? mouseY : 0.5
-    return (n - 0.5) * 26 // ±13°
-  }, [mouseY, inside])
-
-  // a tiny X-wobble based on mouse X makes the disc feel more alive without
-  // requiring a second axis from the user.
-  const xTiltDeg = 0
-
   return (
-    <div className="disc-scene" ref={discRef}>
-      {/* the 3D stage */}
-      <div
-        className="disc-stage"
-        style={{
-          '--y-tilt': `${yTiltDeg}deg`,
-          '--x-tilt': `${xTiltDeg}deg`,
-        } as React.CSSProperties}
-      >
+    <div className="disc-scene">
+      {/* the 3D stage (tilt is driven imperatively; CSS holds the rest pose) */}
+      <div className="disc-stage" ref={discRef}>
         {/* central hub */}
         <div className="disc-hub" aria-hidden="true">
           <img
@@ -114,7 +133,6 @@ export function DiscScene() {
         {/* subtle guide ring */}
         <div className="disc-guide" aria-hidden="true" />
       </div>
-
     </div>
   )
 }
