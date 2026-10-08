@@ -1031,3 +1031,102 @@ code, pre, .coderunner-out, .cm-editor .cm-scroller {
 }
 .account-name { max-width: 92px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 @media (max-width: 620px) { .account-name { display: none; } }
+
+/* ─── Dot-grid background (cursor reveals a soft pool of light) ── */
+.dotgrid {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* ─── Skip to content (keyboard users; visible only on focus) ── */
+.skip-link {
+  position: fixed;
+  top: -48px;
+  left: 12px;
+  z-index: 200;
+  padding: 8px 14px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+  font-family: var(--font-hand-ui);
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: top 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.skip-link:focus-visible { top: 10px; }
+
+/* ─── Reading progress bar (landing only) ── */
+.scroll-progress {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 2px;
+  z-index: 90;
+  background: linear-gradient(90deg, #3776ab, #7fa8cc);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+/* ─── Copy button (code windows) ── */
+.copy-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: transparent; border: 1.5px solid var(--ink);
+  border-radius: 8px 4px 9px 5px / 5px 8px 4px 9px;
+  color: var(--muted); cursor: pointer;
+  padding: 3px 9px;
+  font-family: var(--font-hand-ui); font-size: 0.78rem;
+  transition: transform 140ms cubic-bezier(0.23, 1, 0.32, 1), color 140ms ease, background 140ms ease;
+}
+.copy-btn:hover { color: var(--text); background: color-mix(in srgb, var(--ink) 8%, transparent); transform: translate(-1px, -1px); }
+.copy-btn:active { transform: scale(0.96); }
+
+/* ─── Confirmation dialog ── */
+.confirm-overlay {
+  position: fixed; inset: 0; z-index: 300;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(3px);
+  animation: confirm-fade 180ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.confirm-dialog {
+  width: min(420px, 100%);
+  background: var(--card);
+  border: 2px solid var(--ink);
+  border-radius: 16px 8px 17px 9px / 9px 16px 8px 17px;
+  box-shadow: 6px 6px 0 var(--shadow-ink);
+  padding: 18px 20px 16px;
+  animation: confirm-pop 200ms cubic-bezier(0.23, 1, 0.32, 1);
+  transform-origin: center; /* modals stay centered */
+}
+.confirm-dialog h3 {
+  display: flex; align-items: center; gap: 8px;
+  margin: 0 0 8px; font-size: 1.15rem; font-family: var(--font-hand-ui);
+}
+.confirm-dialog h3 .icon { color: var(--warn); }
+.confirm-dialog p { margin: 0 0 16px; color: var(--muted); font-size: 0.95rem; }
+.confirm-actions { display: flex; justify-content: flex-end; gap: 10px; }
+@keyframes confirm-fade { from { opacity: 0; } }
+@keyframes confirm-pop { from { opacity: 0; transform: scale(0.96); } }
+
+/* ─── Print stylesheet ── */
+@media print {
+  .dotgrid, .topbar, .tabbar, .toasts, .scroll-progress, .skip-link,
+  .hero-glyphs, .hero-glow, .disc-scene, .disc-stage, .btn, .btn-run,
+  .copy-btn, .coderunner-actions, .faq-q-icon, .auth-card, .landing-cta-final { display: none !important; }
+  body { background: #fff !important; color: #000 !important; }
+  .app { min-height: auto; }
+  .topbar + *, .main { padding-top: 0 !important; }
+  a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.8em; color: #444; }
+  .feat, .ltrack, .stat, .faq-item { box-shadow: none !important; border-color: #ccc !important; break-inside: avoid; }
+  .coderunner-out, pre, code { white-space: pre-wrap !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .confirm-overlay, .confirm-dialog { animation: none; }
+  .scroll-progress { transition: none; }
+}

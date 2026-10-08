@@ -12,6 +12,8 @@ import { Auth } from './components/Auth'
 import { NotFound } from './components/NotFound'
 import { Icon } from './components/Icon'
 import { Logo } from './components/Logo'
+import { DotGrid } from './components/DotGrid'
+import { ScrollProgress } from './components/ScrollProgress'
 import { preloadPython } from './pyodide/runner'
 import { useHead } from './useHead'
 
@@ -102,6 +104,21 @@ function Shell() {
 
   return (
     <div className="app">
+      <a
+        className="skip-link"
+        href="#/"
+        onClick={(e) => {
+          e.preventDefault()
+          const main = document.getElementById('main-content')
+          main?.setAttribute('tabindex', '-1')
+          main?.focus({ preventScroll: false })
+          main?.scrollIntoView({ behavior: 'smooth' })
+        }}
+      >
+        Skip to content
+      </a>
+      <DotGrid />
+      {root === 'landing' && <ScrollProgress />}
       {!showAuth && (
         <header className="topbar">
           <button className="brand" onClick={() => navigate('dashboard')}>
@@ -134,7 +151,7 @@ function Shell() {
         </header>
       )}
 
-      <main className={showAuth ? 'main main-auth' : root === 'landing' ? 'main main-landing' : 'main'}>
+      <main id="main-content" className={showAuth ? 'main main-auth' : root === 'landing' ? 'main main-landing' : 'main'}>
         {showAuth && <Auth />}
         {!showAuth && root === 'landing' && (
           <Landing

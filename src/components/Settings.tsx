@@ -2,10 +2,12 @@ import { useState } from 'react'
 import { useApp } from '../state/AppContext'
 import { tracks } from '../curriculum'
 import { Icon } from './Icon'
+import { ConfirmDialog } from './ConfirmDialog'
 
 export function Settings({ navigate }: { navigate: (v: string) => void }) {
-  const { progress, resetAll, auth, guest, accountsEnabled, signOut } = useApp()
+  const { progress, resetAll, auth, guest, accountsEnabled, signOut, pushToast } = useApp()
   const [signingOut, setSigningOut] = useState(false)
+  const [confirmReset, setConfirmReset] = useState(false)
 
   async function handleSignOut() {
     setSigningOut(true)
@@ -26,6 +28,7 @@ export function Settings({ navigate }: { navigate: (v: string) => void }) {
     a.download = `pylearn-backup-${new Date().toISOString().slice(0, 10)}.json`
     a.click()
     URL.revokeObjectURL(url)
+    pushToast('Backup downloaded', 'download')
   }
 
   function importData(file: File) {
@@ -35,9 +38,10 @@ export function Settings({ navigate }: { navigate: (v: string) => void }) {
         const parsed = JSON.parse(String(reader.result))
         if (parsed.progress) localStorage.setItem('pylearn.progress.v1', parsed.progress)
         if (parsed.session) localStorage.setItem('pylearn.session.v1', parsed.session)
-        location.reload()
+        pushToast('Backup imported — reloading…', 'check')
+        setTimeout(() => location.reload(), 600)
       } catch {
-        alert('Not a valid PyLearn backup file.')
+        pushToast('Not a valid PyLearn backup file.', 'alert')
       }
     }
     reader.readAsText(file)
@@ -136,14 +140,26 @@ export function Settings({ navigate }: { navigate: (v: string) => void }) {
             ? 'Wipes progress, XP, achievements, notes, and saved code for this account.'
             : 'Wipes progress, XP, achievements, notes, and saved code on this device.'}
         </p>
-        <button
-          className="btn ghost danger"
-          onClick={() => {
-            if (confirm('Really reset ALL progress? This cannot be undone.')) resetAll()
-          }}
-        >
+        <button className="btn ghost danger" onClick={() => setConfirmReset(true)}>
           Reset everything
         </button>
+        <ConfirmDialog
+          open={confirmReset}
+          title="Reset all progress?"
+          body={
+            auth
+              ? 'This wipes progress, XP, achievements, notes and saved code for this account. It cannot be undone.'
+              : 'This wipes progress, XP, achievements, notes and saved code on this device. It cannot be undone.'
+          }
+          confirmLabel="Reset everything"
+          danger
+          onConfirm={() => {
+            setConfirmReset(false)
+            resetAll()
+            pushToast('All progress has been reset', 'check')
+          }}
+          onCancel={() => setConfirmReset(false)}
+        />
       </section>
 
       <button className="btn ghost" onClick={() => navigate('dashboard')}>

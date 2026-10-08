@@ -12,3 +12,8 @@ server/data
 # Secrets (none are required today, but keep them out of the repo if added)
 .env
 .env.*
+
+# agent skills tooling (local, not site code)
+.agents/
+.claude/
+skills-lock.json

@@ -4,6 +4,7 @@ import { python } from '@codemirror/lang-python'
 import { runPython, isPythonReady, onPythonReady } from '../pyodide/runner'
 import { useApp } from '../state/AppContext'
 import { Icon } from './Icon'
+import { CopyButton } from './CopyButton'
 
 interface Props {
   initialCode: string
@@ -82,6 +83,7 @@ export const CodeRunner = forwardRef<{ getCode: () => string }, Props>(
         </span>
         <div className="coderunner-actions">
           {!ready && <span className="coderunner-loadnote">first run loads Python…</span>}
+          <CopyButton getText={() => code} label="Copy code" />
           {!readOnly && (
             <button className="btn-run" onClick={run} disabled={!canRun} title="Run">
               {running ? 'Running…' : buttonLabel}

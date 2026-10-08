@@ -12,7 +12,24 @@ interface FAQProps {
   className?: string
 }
 
-function FAQItemInner({ item, open, onToggle }: { item: FAQItem; open: boolean; onToggle: () => void }) {
+/** hover-capable pointer? (touch devices expand on tap instead) */
+function canHover(): boolean {
+  return window.matchMedia('(hover: hover) and (pointer: fine)').matches
+}
+
+function FAQItemInner({
+  item,
+  open,
+  onToggle,
+  onHover,
+  onLeave,
+}: {
+  item: FAQItem
+  open: boolean
+  onToggle: () => void
+  onHover: (() => void) | undefined
+  onLeave: (() => void) | undefined
+}) {
   const bodyRef = useRef<HTMLDivElement>(null)
   const [height, setHeight] = useState<number | null>(null)
 
@@ -30,7 +47,7 @@ function FAQItemInner({ item, open, onToggle }: { item: FAQItem; open: boolean; 
   }, [open])
 
   return (
-    <div className="faq-item">
+    <div className="faq-item" onMouseEnter={onHover} onMouseLeave={onLeave}>
       <button
         className={`faq-q ${open ? 'faq-q--open' : ''}`}
         onClick={onToggle}
@@ -49,7 +66,7 @@ function FAQItemInner({ item, open, onToggle }: { item: FAQItem; open: boolean; 
         style={{
           overflow: 'hidden',
           height: height !== null ? `${height}px` : '0px',
-          transition: 'height 0.28s cubic-bezier(0.2, 0.7, 0.2, 1)',
+          transition: 'height 0.24s cubic-bezier(0.23, 1, 0.32, 1)',
         }}
       >
         <div className="faq-a" ref={bodyRef}>
@@ -60,25 +77,60 @@ function FAQItemInner({ item, open, onToggle }: { item: FAQItem; open: boolean; 
   )
 }
 
+/**
+ * Expands on hover on desktop (the item stays open while the pointer is on
+ * it), on tap elsewhere. Clicking pins an item open so it survives the
+ * pointer moving away, and clicking again unpins it.
+ */
+function FaqEntry({ item, hoverable }: { item: FAQItem; hoverable: boolean }) {
+  const [open, setOpen] = useState(false)
+  const [pinned, setPinned] = useState(false)
+
+  return (
+    <FAQItemInner
+      item={item}
+      open={open}
+      onToggle={() => {
+        setPinned((p) => {
+          const next = !p
+          setOpen(next)
+          return next
+        })
+      }}
+      onHover={
+        hoverable
+          ? () => {
+              setOpen(true)
+            }
+          : undefined
+      }
+      onLeave={
+        hoverable
+          ? () => {
+              if (!pinned) setOpen(false)
+            }
+          : undefined
+      }
+    />
+  )
+}
+
 export function FAQ({ items, className }: FAQProps) {
+  const [hoverable, setHoverable] = useState(false)
+
+  useEffect(() => {
+    setHoverable(canHover())
+  }, [])
+
   return (
     <section className={`faq ${className ?? ''}`} aria-label="Frequently asked questions">
       <h2 className="faq-title">
         <Icon name="help" size={20} /> Frequently asked
       </h2>
-      <p className="faq-sub">Tap a question to expand the answer.</p>
       <div className="faq-list">
-        {items.map((item, i) => {
-          const [open, setOpen] = useState(false)
-          return (
-            <FAQItemInner
-              key={i}
-              item={item}
-              open={open}
-              onToggle={() => setOpen((v) => !v)}
-            />
-          )
-        })}
+        {items.map((item, i) => (
+          <FaqEntry key={i} item={item} hoverable={hoverable} />
+        ))}
       </div>
     </section>
   )
