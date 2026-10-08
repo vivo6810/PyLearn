@@ -1,6 +1,9 @@
 // Pyodide runner: executes Python inside a Web Worker so infinite loops can
 // be killed by terminating the worker. Results may carry matplotlib plot
 // images (base64 PNGs) captured by the worker.
+//
+// The playground uses its own worker + protocol (see session.ts), which also
+// goes through worker.ts and its interactive input() handling.
 
 export type RunResult =
   | { ok: true; output: string; plots: string[] }
@@ -28,7 +31,7 @@ export function onPythonReady(cb: () => void): () => void {
 const readyListeners = new Set<() => void>()
 
 function spawn(): Worker {
-  const w = new Worker(new URL('./worker.js', import.meta.url), { type: 'module' })
+  const w = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' })
   w.onmessage = (ev: MessageEvent) => {
     const msg = ev.data as
       | { type: 'ready' }
@@ -89,6 +92,7 @@ export function suggestTimeoutMs(code: string): number {
   return ready ? WORKER_TIMEOUT_MS : Math.max(WORKER_TIMEOUT_MS, LOAD_TIMEOUT_MS)
 }
 
+/** Normal (queued-stdin) execution — used by lessons and exercises. */
 export async function runPython(code: string, timeoutMs?: number, stdin?: string): Promise<RunResult> {
   const w = ensureWorker()
   const id = ++seq

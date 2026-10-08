@@ -51,7 +51,7 @@ export const defaultProgress: ProgressState = {
   lessons: {},
   xp: 0,
   streak: 0,
-  theme: 'dark',
+  theme: 'light',
   achievements: [],
   certificates: [],
 }

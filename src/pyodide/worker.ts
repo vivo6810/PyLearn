@@ -3,6 +3,15 @@
 // auto-installs packages referenced by imports (numpy, pandas, matplotlib…)
 // and captures matplotlib figures as base64 PNGs.
 // The main thread terminates this worker on timeout, so no cleanup is needed.
+//
+// Two stdin modes:
+// - queued (lessons): lines were typed before the run; input() pops them and
+//   raises EOFError when they run out.
+// - interactive (playground): input() with no queued line raises a private
+//   __NeedInput signal; the worker reports it and the main thread collects a
+//   line from the terminal, then re-runs the code with the full answer queue.
+//   Output the replay re-prints is skipped on the UI side (runner.ts sends
+//   printedChars so the terminal knows how much to suppress).
 
 const PYODIDE_VERSION = '0.28.3'
 const INDEX_URL = `https://cdn.jsdelivr.net/pyodide/v${PYODIDE_VERSION}/full/`
@@ -27,7 +36,7 @@ json.dumps(_plts)
 // raise_for_status, .text) and a BeautifulSoup-compatible mini `soup` with
 // find/findall over a few hand-authored pages. Real API surface, no network.
 const WEB_SANDBOX = `
-import sys, types, json as _json
+import sys, types
 
 _PAGES = {
     'https://news.example.dev': '''<html><body><h1>Daily Byte</h1><ul><li>Python 4 rumored</li><li>Semicolons strike back</li><li>Tabs vs spaces: peace treaty signed</li></ul></body></html>''',
@@ -117,14 +126,19 @@ function formatError(e: any): string {
   return tail || msg
 }
 
-async function run(id: number, code: string, stdin?: string) {
+async function run(id: number, code: string, stdin?: string, interactiveQueue?: string[]) {
   if (!pyodide) await bootPromise
   let ok = true
   let error = ''
   let plots: string[] = []
+  let needsInput = false
+  let printed = 0
   try {
     pyodide.setStdout({
-      batched: (s: string) => (self as any).postMessage({ type: 'stdout', id, chunk: s + '\n' }),
+      batched: (s: string) => {
+        printed += s.length + 1
+        ;(self as any).postMessage({ type: 'stdout', id, chunk: s + '\n' })
+      },
     })
     pyodide.setStderr({
       batched: (s: string) => {
@@ -135,30 +149,55 @@ async function run(id: number, code: string, stdin?: string) {
           .filter((l: string) => !l.includes('FigureCanvasAgg is non-interactive'))
           .join('\n')
         if (cleaned.trim() !== '') {
+          printed += cleaned.length + 1
           ;(self as any).postMessage({ type: 'stdout', id, chunk: cleaned + '\n' })
         }
       },
     })
 
-    // Simulated keyboard: a pre-typed stdin box. We patch builtins.input
-    // directly — Pyodide's setStdin only feeds read-from-sys.stdin reliably;
-    // input() can still hit raw EOF. Each input() pops one queued line and
-    // echoes "prompt value" like a real terminal; once the queue runs dry
-    // input() raises EOFError (what a real terminal does when stdin closes).
-    const prologue =
-      `import builtins as _b\n` +
-      `def _make_input(_q):\n` +
-      `    def _input(prompt=''):\n` +
-      `        if not _q:\n` +
-      `            if prompt:\n` +
-      `                print(prompt)\n` +
-      `            raise EOFError('EOF when reading a line - the pretend keyboard box ran out of lines')\n` +
-      `        line = _q.pop(0)\n` +
-      `        print((prompt or '') + line)\n` +
-      `        return line\n` +
-      `    return _input\n` +
-      `_b.input = _make_input(${JSON.stringify((stdin ?? '').split('\n'))})\n` +
-      `del _b, _make_input\n`
+    // Patch builtins.input.
+    // Queued mode: each input() pops one pre-typed line and echoes
+    // "prompt value"; empty queue raises EOFError (what a real terminal does
+    // when stdin closes).
+    // Interactive mode: empty queue raises __NeedInput so the run unwinds and
+    // the UI can collect a line from the terminal. The prompt is printed and
+    // flushed first so it is already visible (and counted in `printed`).
+    let prologue: string
+    if (interactiveQueue) {
+      prologue =
+        `import builtins as _b, sys as _s\n` +
+        `class __NeedInput(Exception):\n` +
+        `    pass\n` +
+        `def _make_input(_q):\n` +
+        `    def _input(prompt=''):\n` +
+        `        prompt = str(prompt)\n` +
+        `        if _q:\n` +
+        `            line = _q.pop(0)\n` +
+        `            print((prompt or '') + line)\n` +
+        `            return line\n` +
+        `        if prompt:\n` +
+        `            print(prompt, end='')\n` +
+        `            _s.stdout.flush()\n` +
+        `        raise __NeedInput(prompt)\n` +
+        `    return _input\n` +
+        `_b.input = _make_input(${JSON.stringify(interactiveQueue)})\n` +
+        `del _b, _make_input\n`
+    } else {
+      prologue =
+        `import builtins as _b\n` +
+        `def _make_input(_q):\n` +
+        `    def _input(prompt=''):\n` +
+        `        if not _q:\n` +
+        `            if prompt:\n` +
+        `                print(prompt)\n` +
+        `            raise EOFError('EOF when reading a line - the pretend keyboard box ran out of lines')\n` +
+        `        line = _q.pop(0)\n` +
+        `        print((prompt or '') + line)\n` +
+        `        return line\n` +
+        `    return _input\n` +
+        `_b.input = _make_input(${JSON.stringify((stdin ?? '').split('\n'))})\n` +
+        `del _b, _make_input\n`
+    }
     pyodide.runPython(prologue)
 
     // Auto-install imports from the Pyodide distribution (numpy, pandas,
@@ -172,7 +211,19 @@ async function run(id: number, code: string, stdin?: string) {
       /* package resolution is best-effort */
     }
 
-    await pyodide.runPythonAsync(code, { globals: pyodide.globals })
+    try {
+      await pyodide.runPythonAsync(code, { globals: pyodide.globals })
+    } catch (e: any) {
+      if (interactiveQueue && /__NeedInput\b/.test(String(e?.message ?? e))) {
+        needsInput = true
+      } else {
+        throw e
+      }
+    }
+    if (needsInput) {
+      ;(self as any).postMessage({ type: 'needsInput', id, printedChars: printed })
+      return
+    }
     const plotsJson = await pyodide.runPythonAsync(PLOT_CAPTURE)
     plots = JSON.parse(plotsJson)
   } catch (e: any) {
@@ -183,8 +234,9 @@ async function run(id: number, code: string, stdin?: string) {
 }
 
 self.onmessage = async (ev: MessageEvent) => {
-  const msg = ev.data as { type: string; id?: number; code?: string; stdin?: string }
+  const msg = ev.data as
+    | { type: 'run'; id: number; code: string; stdin?: string; interactiveQueue?: string[] }
   if (msg.type === 'run' && typeof msg.id === 'number' && typeof msg.code === 'string') {
-    await run(msg.id, msg.code, msg.stdin)
+    await run(msg.id, msg.code, msg.stdin, msg.interactiveQueue)
   }
 }
