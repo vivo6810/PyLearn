@@ -2,7 +2,7 @@ import { Reveal } from './Reveal'
 import { Appear } from './Appear'
 import { Icon } from './Icon'
 import { Parallax } from './Parallax'
-import { DiscScene } from './DiscScene'
+import FlexCarousel from './FlexCarousel'
 import { FAQ } from './FAQ'
 import { tracks, allLessons, totalMinutes } from '../curriculum'
 import logoUrl from '../assets/logo.png'
@@ -15,6 +15,13 @@ const HERO_GLYPHS = [
   { ch: '[ ]', x: '86%', y: '60%', size: 24, depth: 0.16, opacity: 0.15 },
   { ch: '=>', x: '68%', y: '82%', size: 20, depth: 0.26, opacity: 0.1 },
   { ch: 'print', x: '30%', y: '8%', size: 18, depth: 0.12, opacity: 0.1 },
+]
+
+/** Placeholder slides for the track carousel — swap in real photography later. */
+const CAROUSEL_ITEMS = [
+  { src: '/images/one.jpg', alt: 'A chrome sculpture', title: 'Iridescence' },
+  { src: '/images/two.jpg', alt: 'A figure on a white set', title: 'White Room' },
+  { src: '/images/three.jpg', alt: 'A clay bust in profile', title: 'Clay Study', subtitle: 'Studio 04' },
 ]
 
 export function Landing({ navigate, onStart }: { navigate: (v: string) => void; onStart: () => void }) {
@@ -39,7 +46,7 @@ export function Landing({ navigate, onStart }: { navigate: (v: string) => void; 
           </Appear>
           <Appear variant="soft" delay={0.05}>
             <p className="hero-kicker">
-              beginner → advanced · from your own coursebooks
+              beginner → advanced
             </p>
           </Appear>
           {/* headline lines wipe up out of a masked box, staggered */}
@@ -59,8 +66,8 @@ export function Landing({ navigate, onStart }: { navigate: (v: string) => void; 
           </span>
           <Appear variant="soft" delay={0.42}>
             <p className="hero-sub">
-              {allLessons.length} deep lessons · ~{Math.round(totalMinutes / 60)} hours · real Python running in your
-              browser. No installs, no setup.
+              Short lessons, live examples and graded practice — a straight path from your first print() to programs
+              you actually want to build.
             </p>
           </Appear>
           <Appear variant="btn" delay={0.55}>
@@ -84,23 +91,38 @@ export function Landing({ navigate, onStart }: { navigate: (v: string) => void; 
           <Reveal delay={440}>
             <div className="hstat"><strong>{Math.round(totalMinutes / 60)}h</strong><span>of material</span></div>
           </Reveal>
-          <Reveal delay={500}>
-            <div className="hstat"><strong>0</strong><span>installs</span></div>
-          </Reveal>
         </div>
       </section>
 
-      {/* ── 3D disc: track badges orbit a tilted disc, Y-tilt follows mouse ── */}
+      {/* ── carousel: the 6 tracks through a liquid lens ── */}
       <section id="disc" className="xp-section">
-        <Reveal>
-          <h2 className="xp-title">
-            What you will learn <span className="grad">across 6 tracks</span>
-          </h2>
-        </Reveal>
-        <Reveal delay={100}>
-          <p className="xp-sub">Hover the disc — it tilts with you.</p>
-        </Reveal>
-        <DiscScene />
+        <div style={{ width: '100%', height: '680px', position: 'relative' }}>
+          <FlexCarousel
+            items={CAROUSEL_ITEMS}
+            preset="liquid"
+            intro="rise"
+            cardHeight={0.56}
+            gap={12}
+            squeeze={0.2}
+            focusOnClick
+            captions
+            fit="natural"
+            radius={0}
+            lensWidth={0.74}
+            lensHeight={1.18}
+            tilt={74}
+            roundness={1}
+            bend={0.34}
+            reach={0.38}
+            curl="twist"
+            dispersion={0.45}
+            liquid={0}
+            followCursor={false}
+            autoplay={false}
+            interval={4}
+            captureWheel
+          />
+        </div>
       </section>
 
       {/* ── features ── */}
@@ -110,12 +132,10 @@ export function Landing({ navigate, onStart }: { navigate: (v: string) => void; 
         </Parallax>
         <div className="feat-grid">
           {[
-            { icon: 'snake', title: 'Real Python, in-browser', text: 'Every example runs on a genuine Python runtime — including NumPy, Pandas and Matplotlib plots. Your edits run too.' },
+            { icon: 'snake', title: 'Edit any example', text: 'Change the code and press Run — NumPy, Pandas and Matplotlib plots included.' },
             { icon: 'target', title: 'Checked exercises', text: 'Hidden test suites grade your code instantly, test by test, with hints when you stall.' },
             { icon: 'save', title: 'Sessions that survive', text: 'Half-finished quizzes, edited examples, notes and drafts — all saved. Close the tab, resume tomorrow.' },
             { icon: 'medal', title: 'XP, streaks & certificates', text: 'Levels, achievements and a printable certificate for every completed track.' },
-            { icon: 'book', title: 'Built from real books', text: 'Halterman, Sweigart, Klein, Moore — your PDF library, structured into a 3-month path.' },
-            { icon: 'phone', title: 'Runs on your phone', text: 'Phone-first design: full lessons and runnable code, wherever you are.' },
           ].map((f, i) => (
             <Reveal key={f.title} delay={i * 70}>
               <div className="feat">
@@ -161,7 +181,7 @@ export function Landing({ navigate, onStart }: { navigate: (v: string) => void; 
       </section>
 
       {/* ── FAQ ── */}
-      <section className="landing-faq">
+      <section className="landing-faq" id="faq">
         <Parallax speed={0.05}>
           <h2 className="sec-title center">Questions before you start?</h2>
         </Parallax>
@@ -179,24 +199,12 @@ export function Landing({ navigate, onStart }: { navigate: (v: string) => void; 
 function landingFaq() {
   return [
     {
-      q: 'Do I need to install anything?',
-      a: 'No. Every lesson runs real Python in your browser. Nothing to install, nothing to configure — just open the lesson and press Run.',
-    },
-    {
-      q: 'Can I use PyLearn on my phone?',
-      a: 'Yes. The course is mobile-first, and code examples run in your browser, not on a server.',
-    },
-    {
       q: 'How is the course organized?',
       a: 'There are 6 tracks from beginner to advanced. Each track is a sequence of modules and lessons, and every lesson has a short reading, runnable examples, a quiz and one or more graded exercises.',
     },
     {
       q: 'Do I have to follow the tracks in order?',
       a: 'No. Each lesson is usable on its own, but the tracks are arranged so the ideas build smoothly. If you are new to Python, starting at the top of a track is the easiest path.',
-    },
-    {
-      q: 'What is this built from?',
-      a: 'The curriculum is built from real Python books — Halterman, Sweigart, Klein, Moore and others — and structured into a 3-month path. Each lesson lists its source in the header.',
     },
     {
       q: 'How do I keep my progress?',

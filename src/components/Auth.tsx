@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useApp } from '../state/AppContext'
-import { ApiError } from '../state/auth'
+import { ApiError, freebuffSignInUrl } from '../state/auth'
 import { guestHasProgress } from '../state/storage'
 import { Icon } from './Icon'
 import { Logo } from './Logo'
@@ -11,8 +11,54 @@ type Mode = 'signin' | 'signup'
 
 const TURNSTILE_SITE_KEY = (window as unknown as { __ENV?: { TURNSTILE_SITE_KEY?: string } }).__ENV?.TURNSTILE_SITE_KEY ?? '' // injected by the build
 
+/**
+ * Freebuff-hosted deployments sign visitors in through Freebuff itself (Google,
+ * GitHub or Apple), so there is no password to type and no sign-up form.
+ */
+function FreebuffSignIn() {
+  const { continueAsGuest } = useApp()
+  const adopting = guestHasProgress()
+  // Come back to the view the visitor was on before the round trip.
+  const returnTo = typeof location !== 'undefined' && location.hash ? `/${location.hash}` : '/'
+
+  return (
+    <div className="auth-wrap">
+      <div className="auth-card">
+        <div className="auth-brand">
+          <Logo size={32} />
+          <span>PyLearn</span>
+        </div>
+
+        <h1>Keep your progress</h1>
+        <p className="muted auth-lede">
+          Sign in with Freebuff to save your XP, streak and certificates to one account. Freebuff handles the sign-in —
+          there is no password to remember.
+        </p>
+
+        <a className="btn primary big auth-submit" href={freebuffSignInUrl(returnTo)}>
+          <Icon name="lock" size={15} />
+          Sign in with Freebuff
+        </a>
+
+        {adopting && (
+          <div className="auth-note">
+            <Icon name="sparkles" size={15} /> The progress on this device moves into your account.
+          </div>
+        )}
+
+        <button className="btn ghost auth-guest" type="button" onClick={continueAsGuest}>
+          Continue without an account
+        </button>
+        <p className="muted auth-foot">
+          Without an account your progress stays in this browser only — clearing site data loses it.
+        </p>
+      </div>
+    </div>
+  )
+}
+
 export function Auth() {
-  const { signIn, signUp, continueAsGuest } = useApp()
+  const { signIn, signUp, continueAsGuest, provider } = useApp()
   const [mode, setMode] = useState<Mode>('signin')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -21,6 +67,10 @@ export function Auth() {
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const turnstile = useTurnstile(TURNSTILE_SITE_KEY)
+
+  // Nothing to type here on a Freebuff-hosted deployment: Freebuff is the
+  // identity provider, so the email/password form does not apply.
+  if (provider === 'freebuff') return <FreebuffSignIn />
 
   // Adopting only applies when creating an account — signing in loads the
   // account's own saved progress instead.

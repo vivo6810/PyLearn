@@ -17,3 +17,11 @@ server/data
 .agents/
 .claude/
 skills-lock.json
+
+# Cloud chat attachments (screenshots + the full chat transcript). Never
+# publish these — the transcript contains local paths and the whole session.
+.cloud-attachments/
+
+# Cloudflare Workers local run + the bundled Worker we upload
+build/
+.wrangler/

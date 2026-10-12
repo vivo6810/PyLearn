@@ -98,14 +98,6 @@ function trackFaq(_track: typeof tracks[number]) {
       a: 'Your progress, quiz scores and exercise results are saved on this device and, if you are signed in, synced to your account. Completing a lesson also awards XP and can unlock achievements.',
     },
     {
-      q: 'Can I use this on my phone?',
-      a: 'Yes. The course is designed mobile-first, so you can learn on the bus, in a queue or anywhere else. Code examples run in your browser, so there is nothing to install.',
-    },
-    {
-      q: 'Where do the lessons come from?',
-      a: 'The curriculum is built from real Python books (Halterman, Sweigart, Klein and others) and structured into a 3-month path. Each lesson lists its source in the header.',
-    },
-    {
       q: 'How do I get a certificate?',
       a: 'Finish every lesson in a track. When you do, the track certificate appears on the track page and in Settings.',
     },

@@ -1,0 +1,29 @@
+// Local Cloudflare Workers run of the PyLearn site (`npx wrangler dev`), which
+// mirrors the Freebuff deployment: the same Worker bundle, the same
+// compatibility date, the same bindings.
+//
+// The client ID and origin below are the *development* (localhost) values from
+// Freebuff provisioning. They are public configuration, not secrets.
+{
+  "name": "pylearn-local",
+  "main": "build/worker.js",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "run_worker_first": true,
+    "not_found_handling": "single-page-application"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "pylearn-local",
+      "database_id": "e4f1e1f5-96fc-45c0-b941-8e9439789b0a"
+    }
+  ],
+  "vars": {
+    "FREEBUFF_CLIENT_ID": "aeac6451-4a25-4707-b448-0557d5036bf9",
+    "FREEBUFF_ISSUER": "https://freebuff.com/oidc",
+    "APP_ORIGIN": "http://localhost:8787"
+  }
+}

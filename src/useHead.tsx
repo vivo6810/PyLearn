@@ -37,14 +37,14 @@ function pageMeta(view: string): Meta | null {
     return {
       title: 'PyLearn — Master Python',
       description:
-        '35 free lessons across 6 tracks, quizzes, hidden-test exercises, XP and certificates — real Python running in your browser.',
+        'A structured Python course with lessons, quizzes, graded exercises, XP and certificates — a structured path from first steps to confident Python.',
       ogTitle: 'PyLearn — Master Python',
       ogDescription:
-        '35 lessons across 6 tracks, quizzes, hidden-test exercises, XP and certificates — real Python running in your browser.',
+        'A structured Python course with lessons, quizzes, graded exercises, XP and certificates — a structured path from first steps to confident Python.',
       twitterCard: 'summary',
       twitterTitle: 'PyLearn — Master Python',
       twitterDescription:
-        '35 lessons across 6 tracks, quizzes, hidden-test exercises, XP and certificates — real Python running in your browser.',
+        'A structured Python course with lessons, quizzes, graded exercises, XP and certificates — a structured path from first steps to confident Python.',
       image: logoUrl,
       alt: 'PyLearn — Master Python',
     }
@@ -75,7 +75,7 @@ function pageMeta(view: string): Meta | null {
     return {
       title: 'My dashboard — PyLearn',
       description:
-        `Continue your free Python course — ${allLessons.length} lessons, XP, streaks and certificates, all saved in your browser on this device.`,
+        `Continue your free Python course — XP, streaks and certificates, saved on this device.`,
       ogTitle: 'My PyLearn dashboard',
       ogDescription:
         `Continue your free Python course — ${allLessons.length} lessons, XP, streaks and certificates.`,
@@ -92,14 +92,14 @@ function pageMeta(view: string): Meta | null {
     return {
       title: 'Python playground — PyLearn',
       description:
-        'A free scratchpad where you can run any Python code in your browser. Your code is saved automatically on this device.',
+        'A free scratchpad for running and testing Python code. Your work is saved automatically on this device.',
       ogTitle: 'Python playground — PyLearn',
       ogDescription:
-        'A free scratchpad where you can run any Python code in your browser. Your code is saved automatically on this device.',
+        'A free scratchpad for running and testing Python code. Your work is saved automatically on this device.',
       twitterCard: 'summary',
       twitterTitle: 'Python playground — PyLearn',
       twitterDescription:
-        'A free scratchpad where you can run any Python code in your browser. Your code is saved automatically on this device.',
+        'A free scratchpad for running and testing Python code. Your work is saved automatically on this device.',
       image: logoUrl,
       alt: 'PyLearn Python playground',
     }
@@ -146,14 +146,14 @@ function pageMeta(view: string): Meta | null {
     return {
       title: `${track.title} — Python course · PyLearn`,
       description:
-        `${track.blurb} ${lessons.length} lessons, built from real Python books — Halterman, Sweigart, Klein and more. Free, runs in your browser.`,
+        `${track.blurb} ${lessons.length} lessons with quizzes, graded exercises and certificates.`,
       ogTitle: `${track.title} — PyLearn`,
       ogDescription:
-        `${track.blurb} ${lessons.length} lessons, built from real Python books. Free, runs in your browser.`,
+        `${track.blurb} ${lessons.length} lessons with quizzes, graded exercises and certificates.`,
       twitterCard: 'summary',
       twitterTitle: `${track.title} — PyLearn`,
       twitterDescription:
-        `${track.blurb} ${lessons.length} lessons, built from real Python books. Free, runs in your browser.`,
+        `${track.blurb} ${lessons.length} lessons with quizzes, graded exercises and certificates.`,
       image: logoUrl,
       alt: `${track.title} — PyLearn track`,
     }
@@ -185,12 +185,12 @@ function pageMeta(view: string): Meta | null {
   // anything else (unknown view) falls back to the site home
   return {
     title: 'PyLearn — Master Python',
-    description: '35 free lessons across 6 tracks, quizzes, hidden-test exercises, XP and certificates — real Python running in your browser.',
+    description: 'A structured Python course with lessons, quizzes, graded exercises, XP and certificates — a structured path from first steps to confident Python.',
     ogTitle: 'PyLearn — Master Python',
-    ogDescription: '35 lessons across 6 tracks, quizzes, hidden-test exercises, XP and certificates — real Python running in your browser.',
+    ogDescription: 'A structured Python course with lessons, quizzes, graded exercises, XP and certificates — a structured path from first steps to confident Python.',
     twitterCard: 'summary',
     twitterTitle: 'PyLearn — Master Python',
-    twitterDescription: '35 lessons across 6 tracks, quizzes, hidden-test exercises, XP and certificates — real Python running in your browser.',
+    twitterDescription: 'A structured Python course with lessons, quizzes, graded exercises, XP and certificates.',
     image: logoUrl,
     alt: 'PyLearn — Master Python',
   }

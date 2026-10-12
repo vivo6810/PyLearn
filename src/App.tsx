@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AppProvider, useApp } from './state/AppContext'
 import { tracks } from './curriculum'
 import { Dashboard } from './components/Dashboard'
@@ -16,6 +16,7 @@ import { DotGrid } from './components/DotGrid'
 import { ScrollProgress } from './components/ScrollProgress'
 import { preloadPython } from './pyodide/runner'
 import { useHead } from './useHead'
+import { ThemeSwitch, type ThemeSwitchHandle } from './components/ThemeSwitch'
 
 export type View =
   | 'landing'
@@ -55,6 +56,19 @@ function initials(name: string): string {
 function Shell() {
   const [view, setView] = useState<View>(parseHash)
   const { theme, toggleTheme, toasts, auth, authReady, accountsEnabled, guest } = useApp()
+  const themeRef = useRef<ThemeSwitchHandle>(null)
+
+  // Flip the theme through the pixel dissolve instead of instantly.
+  const swapTheme = () => themeRef.current?.play(toggleTheme)
+
+  // Top-nav FAQ shortcut: make sure the landing page is up, then scroll to it
+  // (twice — once for the scroll, again in case the section is still settling).
+  const goFaq = () => {
+    if (view !== 'landing') navigate('landing')
+    const jump = () => document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    window.setTimeout(jump, 160)
+    window.setTimeout(jump, 900)
+  }
 
   function navigate(v: string) {
     location.hash = '/' + v
@@ -68,6 +82,18 @@ function Shell() {
     window.addEventListener('hashchange', onHash)
     return () => window.removeEventListener('hashchange', onHash)
   }, [])
+
+  // Publish the sticky topbar height so CSS can size the playground IDE to
+  // exactly the remaining viewport (the bar hides on the auth screen).
+  useEffect(() => {
+    const setTopH = () => {
+      const h = document.querySelector('.topbar')?.getBoundingClientRect().height ?? 56
+      document.documentElement.style.setProperty('--top-h', `${Math.round(h)}px`)
+    }
+    setTopH()
+    window.addEventListener('resize', setTopH)
+    return () => window.removeEventListener('resize', setTopH)
+  }, [view])
 
   // If the boot splash is still showing on reload but we already have a cached
   // account, skip straight to the app so the splash can't get stuck.
@@ -131,6 +157,9 @@ function Shell() {
             <button className={'toplink' + (root === 'playground' ? ' active' : '')} onClick={() => navigate('playground')}>
               <Icon name="flask" size={16} /> Playground
             </button>
+            <button className="toplink" onClick={goFaq} title="Frequently asked questions">
+              <Icon name="help" size={16} /> FAQ
+            </button>
             <button className={'toplink' + (root === 'settings' ? ' active' : '')} onClick={() => navigate('settings')} title="Settings">
               <Icon name="gear" size={16} />
             </button>
@@ -144,14 +173,25 @@ function Shell() {
                 <Icon name="lock" size={16} /> Sign in
               </button>
             ) : null}
-            <button className="toplink" onClick={toggleTheme} title="Toggle theme">
+            <button className="toplink" onClick={swapTheme} title="Toggle theme">
               <Icon name={theme === 'dark' ? 'sun' : 'moon'} size={16} />
             </button>
           </nav>
         </header>
       )}
 
-      <main id="main-content" className={showAuth ? 'main main-auth' : root === 'landing' ? 'main main-landing' : 'main'}>
+      <main
+        id="main-content"
+        className={
+          showAuth
+            ? 'main main-auth'
+            : root === 'landing'
+              ? 'main main-landing'
+              : root === 'playground'
+                ? 'main main-playground'
+                : 'main'
+        }
+      >
         {showAuth && <Auth />}
         {!showAuth && root === 'landing' && (
           <Landing
@@ -195,6 +235,8 @@ function Shell() {
           </div>
         ))}
       </div>
+
+      <ThemeSwitch ref={themeRef} />
     </div>
   )
 }

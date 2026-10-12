@@ -56,6 +56,9 @@ export function DotGrid() {
     function paintBase() {
       const w = window.innerWidth
       const h = window.innerHeight
+      // a 0x0 viewport (transient during reload / hidden iframe) can't be
+      // drawn — painting it would throw and unmount the whole tree.
+      if (w < 1 || h < 1) return
       dpr = Math.min(window.devicePixelRatio || 1, 2)
       canvas!.width = w * dpr
       canvas!.height = h * dpr
@@ -83,6 +86,7 @@ export function DotGrid() {
       const ctx2 = ctx!
       ctx2.setTransform(1, 0, 0, 1, 0, 0)
       ctx2.clearRect(0, 0, canvas!.width, canvas!.height)
+      if (base.width < 1 || base.height < 1) return // not painted yet
       ctx2.drawImage(base, 0, 0)
       if (!interactive) return
 

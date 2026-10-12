@@ -1,18 +1,23 @@
 // Interactive playground session: owns the Pyodide worker and implements the
 // input() loop. When the program asks for input with no queued answer, the
 // worker raises __NeedInput; we surface the prompt, collect a line from the
-// terminal, and replay the code with all answers queued — suppressing the
-// output the user already saw so the run reads as one continuous session.
+// terminal, and replay the code with all answers queued — resetting the
+// terminal to the fresh attempt's output so the run reads as one continuous
+// session.
 //
-// The worker is owned exclusively here (a fresh Worker per session), so
-// lessons using runPython() on the shared runner worker are unaffected.
+// The worker is owned exclusively here, so lessons using runPython() on the
+// shared runner worker are unaffected. The worker (and the Python runtime
+// inside it) is reused across Runs and only terminated on Stop, unmount, or
+// timeout.
 
 import type { TerminalLine } from '../components/Terminal'
 
 type Events = {
+  /** a new attempt began: discard everything shown so far */
+  reset: () => void
   output: (line: TerminalLine) => void
   needInput: (prompt: string) => void
-  finished: (r: { ok: boolean; error?: string; plots: number; timedOut?: boolean }) => void
+  finished: (r: { ok: boolean; error?: string; plots: string[]; timedOut?: boolean }) => void
 }
 
 const HEAVY_IMPORTS = /(^|\n)\s*(import|from)\s+(numpy|pandas|matplotlib|scipy|sklearn)/
@@ -21,7 +26,6 @@ export class PlaygroundSession {
   private worker: Worker | null = null
   private seq = 0
   private answers: string[] = []
-  private suppress = 0
   private running = false
   private aborted = false
   private ev: Events
@@ -35,11 +39,10 @@ export class PlaygroundSession {
   }
 
   async start(code: string) {
-    this.stop() // clears any previous run
+    if (this.running) return
     this.running = true
     this.aborted = false
     this.answers = []
-    this.suppress = 0
     const w = this.ensureWorker()
 
     const heavy = HEAVY_IMPORTS.test(code)
@@ -48,61 +51,72 @@ export class PlaygroundSession {
     const attempt = (): Promise<void> =>
       new Promise((resolve) => {
         const id = ++this.seq
-        let seen = 0
-        let promptShown = false
 
         const timer = setTimeout(() => {
           cleanup()
           this.killWorker()
           this.ev.output({ kind: 'err', text: `Timed out after ${Math.round(limit / 1000)} s — possible infinite loop. The Python runtime was restarted.` })
           this.running = false
+          this.ev.finished({ ok: false, error: 'timeout', plots: [] })
           resolve()
         }, limit)
 
         const cleanup = () => {
           w.removeEventListener('message', onMsg)
           clearTimeout(timer)
+          if (this.pendingCancel === cancel) this.pendingCancel = null
         }
+        // stop() must cancel the in-flight attempt, otherwise the timeout
+        // timer fires long after the user pressed Stop and prints a bogus
+        // "Timed out" error over their output.
+        const cancel = () => {
+          cleanup()
+          resolve()
+        }
+        this.pendingCancel = cancel
 
         const onMsg = (ev: MessageEvent) => {
           const msg = ev.data as any
           if (msg.type === 'ready') return
+          if (msg.type === 'bootError') {
+            // Pyodide failed to load: fail the run cleanly instead of
+            // waiting for the timeout.
+            cleanup()
+            const text = typeof msg.error === 'string' ? msg.error : 'Failed to load the Python runtime.'
+            this.ev.output({ kind: 'err', text })
+            this.ev.finished({ ok: false, error: text, plots: [] })
+            this.running = false
+            this.killWorker()
+            resolve()
+            return
+          }
           if (msg.id !== id) return
 
           if (msg.type === 'stdout') {
-            // Replays re-print the prefix the user already saw; drop it.
-            seen += msg.chunk.length
-            if (seen <= this.suppress) return
-            let chunk: string = msg.chunk
-            if (seen - msg.chunk.length < this.suppress) {
-              chunk = chunk.slice(this.suppress - (seen - msg.chunk.length))
-            }
-            for (const line of chunk.replace(/\n$/, '').split('\n')) {
+            for (const line of msg.chunk.replace(/\n$/, '').split('\n')) {
               this.ev.output({ kind: 'out', text: line })
             }
             return
           }
           if (msg.type === 'needsInput') {
+            // Resolve the attempt so the start() loop proceeds to waitLine()
+            // — without this the session deadlocks on the first input().
             cleanup()
-            this.suppress = msg.printedChars
-            if (!promptShown) {
-              promptShown = true
-              this.ev.needInput(msg.prompt ?? '')
-            }
+            this.ev.needInput(typeof msg.prompt === 'string' ? msg.prompt : '')
+            resolve()
             return
           }
           if (msg.type === 'result') {
             cleanup()
             if (msg.ok) {
-              if (msg.plots?.length) {
-                this.ev.output({ kind: 'sys', text: `${msg.plots.length} plot(s) opened in the plot panel.` })
-                this.ev.finished({ ok: true, plots: msg.plots.length })
-              } else {
-                this.ev.finished({ ok: true, plots: 0 })
+              const plots: string[] = msg.plots ?? []
+              if (plots.length) {
+                this.ev.output({ kind: 'sys', text: `${plots.length} plot(s) — shown under the editor.` })
               }
+              this.ev.finished({ ok: true, plots })
             } else {
               this.ev.output({ kind: 'err', text: msg.error ?? 'Unknown error' })
-              this.ev.finished({ ok: false, error: msg.error, plots: 0 })
+              this.ev.finished({ ok: false, error: msg.error, plots: [] })
             }
             this.running = false
             resolve()
@@ -111,6 +125,8 @@ export class PlaygroundSession {
         }
 
         w.addEventListener('message', onMsg)
+        // Fresh attempt: the terminal shows only this run's output.
+        this.ev.reset()
         w.postMessage({ type: 'run', id, code, interactiveQueue: [...this.answers] })
       })
 
@@ -124,11 +140,12 @@ export class PlaygroundSession {
       const line = await this.waitLine()
       if (line === null) break // aborted while waiting
       this.answers.push(line)
-      this.ev.output({ kind: 'out', text: line }) // echo the answer
     }
   }
 
   private lineResolver: ((line: string | null) => void) | null = null
+  /** cancels the in-flight attempt (set while a run is waiting on the worker) */
+  private pendingCancel: (() => void) | null = null
 
   private waitLine(): Promise<string | null> {
     return new Promise((resolve) => {
@@ -142,13 +159,25 @@ export class PlaygroundSession {
     this.lineResolver = null
   }
 
-  /** Stop everything and dispose the worker. */
-  stop() {
+  /** Stop the current run.
+      Returns 'warm' when we were only waiting at an input() prompt (the
+      worker is idle — Python stays loaded for the next Run), or
+      'restarted' when the worker had to be killed (it may be stuck
+      executing user code, so the runtime must restart). */
+  stop(): 'warm' | 'restarted' {
+    const wasWaiting = this.lineResolver !== null
     this.aborted = true
     this.running = false
     this.lineResolver?.(null)
     this.lineResolver = null
+    if (wasWaiting && !this.pendingCancel) {
+      // Idle at a prompt: nothing is executing, keep the runtime alive.
+      return 'warm'
+    }
+    this.pendingCancel?.()
+    this.pendingCancel = null
     this.killWorker()
+    return 'restarted'
   }
 
   private killWorker() {

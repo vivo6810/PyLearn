@@ -28,7 +28,7 @@ export const foundations: Track = {
           sections: [
             {
               h: 'Why Python?',
-              md: `Python is a **general-purpose, interpreted** language: you write text, and the Python interpreter reads it top to bottom, doing what you say. There is no visible compile step, which makes experimenting instant.\n\nThree things make Python special:\n\n1. **Readable syntax** — code looks close to English.\n2. **Interpreted** — press Run, see the result. Fast feedback makes learning fast.\n3. **A huge ecosystem** — from automating boring files to training neural networks.\n\n> **Every code block with a ▶ button runs real Python in your browser.** Nothing to install.`,
+              md: `Python is a **general-purpose, interpreted** language: you write text, and the Python interpreter reads it top to bottom, doing what you say. There is no visible compile step, which makes experimenting instant.\n\nThree things make Python special:\n\n1. **Readable syntax** — code looks close to English.\n2. **Interpreted** — press Run, see the result. Fast feedback makes learning fast.\n3. **A huge ecosystem** — from automating boring files to training neural networks.\n\n> **Every code block with a ▶ button runs for real — change it and try again.**`,
             },
             {
               h: 'Your first program',

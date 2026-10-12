@@ -20,6 +20,7 @@ export function Terminal({
   onAbort,
   runtimeReady,
   busy = false,
+  hideBar = false,
 }: {
   lines: TerminalLine[]
   waiting: boolean
@@ -28,6 +29,8 @@ export function Terminal({
   runtimeReady: boolean
   /** a run is executing (even if not waiting for input) */
   busy?: boolean
+  /** playground draws its own toolbars — hide this one */
+  hideBar?: boolean
 }) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -61,19 +64,21 @@ export function Terminal({
 
   return (
     <div className="term">
-      <div className="term-bar">
-        <span className="term-dots" aria-hidden="true">
-          <i /><i /><i />
-        </span>
-        <span className="term-title">
-          <Icon name="terminal" size={13} /> output
-        </span>
-        {busy && (
-          <button className="term-stop" onClick={onAbort} title="Stop (restarts the Python runtime)">
-            <Icon name="x" size={12} /> stop
-          </button>
-        )}
-      </div>
+      {!hideBar && (
+        <div className="term-bar">
+          <span className="term-dots" aria-hidden="true">
+            <i /><i /><i />
+          </span>
+          <span className="term-title">
+            <Icon name="terminal" size={13} /> output
+          </span>
+          {busy && (
+            <button className="term-stop" onClick={onAbort} title="Stop (restarts the Python runtime)">
+              <Icon name="x" size={12} /> stop
+            </button>
+          )}
+        </div>
+      )}
       <div className="term-scroll" ref={scrollRef} onScroll={onScroll}>
         {lines.map((l, i) =>
           l.kind === 'prompt' ? (

@@ -62,8 +62,9 @@ export function Settings({ navigate }: { navigate: (v: string) => void }) {
         {auth ? (
           <>
             <p className="muted">
-              Signed in as <strong>{auth.name}</strong> ({auth.email}). Your XP, lessons and certificates are saved to
-              this account and follow you to any browser.
+              Signed in as <strong>{auth.name}</strong>
+              {auth.email ? ` (${auth.email})` : ''}. Your XP, lessons and certificates are saved to this account and
+              follow you to any browser.
             </p>
             <div className="settings-actions">
               <button className="btn ghost" onClick={handleSignOut} disabled={signingOut}>

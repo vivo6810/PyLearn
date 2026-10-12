@@ -78,8 +78,7 @@ export function Dashboard({ navigate }: { navigate: (v: string) => void }) {
       <section className="hero">
         <h1>Master Python</h1>
         <p>
-          {allLessons.length} deep lessons · ~{Math.round(totalMinutes / 60)} h of material · 3 months at 3 h/day ·
-          structured from your own coursebooks.
+          Your path from the first lesson to writing programs on your own — pick it up wherever you left off.
         </p>
         <div className="hero-actions">
           <button

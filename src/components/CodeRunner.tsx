@@ -27,6 +27,10 @@ interface Props {
   onRun?: () => void
   /** stretch the editor to fill its container (playground split view) */
   fillHeight?: boolean
+  /** hide the built-in header bar (playground renders its own IDE toolbar) */
+  hideBar?: boolean
+  /** filename shown in the header tab (default "python") */
+  tabLabel?: string
 }
 
 export const CodeRunner = forwardRef<{ getCode: () => string }, Props>(
@@ -47,6 +51,8 @@ export const CodeRunner = forwardRef<{ getCode: () => string }, Props>(
       running: externalRunning,
       onRun,
       fillHeight = false,
+      hideBar = false,
+      tabLabel = 'python',
     }: Props,
     ref,
   ) {
@@ -105,22 +111,25 @@ export const CodeRunner = forwardRef<{ getCode: () => string }, Props>(
 
     return (
       <div className="coderunner" data-compact={compact || undefined}>
-        <div className="coderunner-bar">
-          <span className="coderunner-lang">
-            <img src="/favicon.png" alt="" width={16} height={16} style={{ display: 'block' }} draggable={false} /> python
-          </span>
-          <div className="coderunner-actions">
-            {!ready && <span className="coderunner-loadnote">first run loads Python…</span>}
-            <CopyButton getText={() => code} label="Copy code" />
-            {!readOnly && (
-              <button className="btn-run" onClick={run} disabled={!canRun} title="Run">
-                {running ? 'Running…' : buttonLabel}
-              </button>
-            )}
+        {!hideBar && (
+          <div className="coderunner-bar">
+            <span className="coderunner-lang">
+              <img src="/favicon.png" alt="" width={16} height={16} style={{ display: 'block' }} draggable={false} /> {tabLabel}
+            </span>
+            <div className="coderunner-actions">
+              {!ready && <span className="coderunner-loadnote">first run loads Python…</span>}
+              <CopyButton getText={() => code} label="Copy code" />
+              {!readOnly && (
+                <button className="btn-run" onClick={run} disabled={!canRun} title="Run">
+                  {running ? 'Running…' : buttonLabel}
+                </button>
+              )}
+            </div>
           </div>
-        </div>
+        )}
         <CodeMirror
           value={code}
+          className={fillHeight ? 'cm-fill' : undefined}
           height={fillHeight ? '100%' : `${minHeight}px`}
           theme={theme === 'dark' ? 'dark' : 'light'}
           extensions={[python()]}

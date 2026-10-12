@@ -17,6 +17,7 @@ const PYODIDE_VERSION = '0.28.3'
 const INDEX_URL = `https://cdn.jsdelivr.net/pyodide/v${PYODIDE_VERSION}/full/`
 
 let pyodide: any = null
+let bootError = ''
 
 const PLOT_CAPTURE = `
 import sys, io, base64, json
@@ -112,10 +113,8 @@ async function boot() {
 }
 
 const bootPromise = boot().catch((err) => {
-  ;(self as any).postMessage({
-    type: 'bootError',
-    error: 'Failed to load Python runtime: ' + (err?.message ?? String(err)),
-  })
+  bootError = 'Failed to load Python runtime: ' + (err?.message ?? String(err))
+  ;(self as any).postMessage({ type: 'bootError', error: bootError })
 })
 
 function formatError(e: any): string {
@@ -128,6 +127,15 @@ function formatError(e: any): string {
 
 async function run(id: number, code: string, stdin?: string, interactiveQueue?: string[]) {
   if (!pyodide) await bootPromise
+  if (!pyodide) {
+    // Boot failed — report a clean error instead of a null-deref traceback.
+    ;(self as any).postMessage({
+      type: 'result', id, ok: false,
+      error: bootError || 'Failed to load the Python runtime.',
+      plots: [],
+    })
+    return
+  }
   let ok = true
   let error = ''
   let plots: string[] = []
@@ -160,14 +168,18 @@ async function run(id: number, code: string, stdin?: string, interactiveQueue?: 
     // "prompt value"; empty queue raises EOFError (what a real terminal does
     // when stdin closes).
     // Interactive mode: empty queue raises __NeedInput so the run unwinds and
-    // the UI can collect a line from the terminal. The prompt is printed and
-    // flushed first so it is already visible (and counted in `printed`).
+    // the UI can collect a line from the terminal. The prompt is stashed in
+    // `_pending` and returned in the needsInput message — batched stdout never
+    // sees it (no trailing newline), so sending it out-of-band is the only
+    // reliable way to render the prompt row. BaseException so a user's
+    // `except Exception` can't swallow the control-flow signal.
     let prologue: string
     if (interactiveQueue) {
       prologue =
-        `import builtins as _b, sys as _s\n` +
-        `class __NeedInput(Exception):\n` +
+        `import builtins as _b\n` +
+        `class __NeedInput(BaseException):\n` +
         `    pass\n` +
+        `_pending = {'prompt': ''}\n` +
         `def _make_input(_q):\n` +
         `    def _input(prompt=''):\n` +
         `        prompt = str(prompt)\n` +
@@ -175,9 +187,7 @@ async function run(id: number, code: string, stdin?: string, interactiveQueue?: 
         `            line = _q.pop(0)\n` +
         `            print((prompt or '') + line)\n` +
         `            return line\n` +
-        `        if prompt:\n` +
-        `            print(prompt, end='')\n` +
-        `            _s.stdout.flush()\n` +
+        `        _pending['prompt'] = prompt\n` +
         `        raise __NeedInput(prompt)\n` +
         `    return _input\n` +
         `_b.input = _make_input(${JSON.stringify(interactiveQueue)})\n` +
@@ -221,7 +231,13 @@ async function run(id: number, code: string, stdin?: string, interactiveQueue?: 
       }
     }
     if (needsInput) {
-      ;(self as any).postMessage({ type: 'needsInput', id, printedChars: printed })
+      let prompt = ''
+      try {
+        prompt = String(pyodide.runPython('_pending["prompt"]') ?? '')
+      } catch {
+        /* prompt stays empty */
+      }
+      ;(self as any).postMessage({ type: 'needsInput', id, prompt, printedChars: printed })
       return
     }
     const plotsJson = await pyodide.runPythonAsync(PLOT_CAPTURE)

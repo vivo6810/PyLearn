@@ -17,12 +17,13 @@ import {
 import {
   fetchRemoteProgress,
   fetchSession,
+  freebuffSignOut,
   pushRemoteProgress,
   signIn as apiSignIn,
   signOut as apiSignOut,
   signUp as apiSignUp,
 } from './auth'
-import type { AuthUser } from './auth'
+import type { AuthProvider, AuthUser } from './auth'
 import { ACHIEVEMENTS } from '../achievements'
 
 /** Set once the learner picks "continue without an account". */
@@ -55,6 +56,8 @@ interface Ctx {
   authReady: boolean
   /** False on a static-only deploy (no API): the app runs guest-only. */
   accountsEnabled: boolean
+  /** Set once the API has been probed: 'password' or 'freebuff'. */
+  provider: AuthProvider | null
   guest: boolean
   signUp: (email: string, password: string, name: string) => Promise<void>
   signIn: (email: string, password: string) => Promise<void>
@@ -84,6 +87,7 @@ export function AppProvider({ tracks, children }: { tracks: Track[]; children: R
   const [auth, setAuth] = useState<AuthUser | null>(null)
   const [authReady, setAuthReady] = useState(false)
   const [accountsEnabled, setAccountsEnabled] = useState(false)
+  const [provider, setProvider] = useState<AuthProvider | null>(null)
   const [guest, setGuest] = useState(() => {
     try {
       return localStorage.getItem(GUEST_KEY) === '1'
@@ -179,9 +183,10 @@ export function AppProvider({ tracks, children }: { tracks: Track[]; children: R
     let cancelled = false
     ;(async () => {
       try {
-        const { available, user } = await fetchSession()
+        const { available, provider: kind, user } = await fetchSession()
         if (cancelled) return
         setAccountsEnabled(available)
+        setProvider(kind)
         if (available && user) await applyAccount(user)
       } finally {
         if (!cancelled) setAuthReady(true)
@@ -223,7 +228,8 @@ export function AppProvider({ tracks, children }: { tracks: Track[]; children: R
     try {
       // Save the final state while the session is still valid.
       await pushRemoteProgress(progress)
-      await apiSignOut()
+      if (provider === 'freebuff') await freebuffSignOut()
+      else await apiSignOut()
     } catch {
       /* still drop the local session below */
     }
@@ -231,7 +237,7 @@ export function AppProvider({ tracks, children }: { tracks: Track[]; children: R
     setSession(loadSession())
     setProgress(loadProgress())
     setAuth(null)
-  }, [progress])
+  }, [progress, provider])
 
   const continueAsGuest = useCallback(() => {
     try {
@@ -444,6 +450,7 @@ export function AppProvider({ tracks, children }: { tracks: Track[]; children: R
     auth,
     authReady,
     accountsEnabled,
+    provider,
     guest,
     signUp,
     signIn,

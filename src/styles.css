@@ -553,7 +553,9 @@ code, pre, .coderunner-out, .cm-editor .cm-scroller {
   margin: 0 0 18px;
   letter-spacing: 0;
 }
-.hero-sub { color: var(--muted); max-width: min(620px, 92vw); font-size: 1.05rem; margin: 0 0 26px; }
+/* balanced, narrower measure so the subtitle doesn't sprawl wider than the headline */
+.hero-sub { color: var(--muted); max-width: min(540px, 92vw); font-size: 1.05rem; margin: 0 0 26px; text-wrap: balance; }
+.landing-faq { scroll-margin-top: 92px; }
 .hero-cta { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
 .hero-stats { display: flex; gap: 34px; margin-top: 54px; flex-wrap: wrap; justify-content: center; }
 .hstat { display: flex; flex-direction: column; align-items: center; }
@@ -1007,7 +1009,7 @@ code, pre, .coderunner-out, .cm-editor .cm-scroller {
 
 .auth-submit,
 .auth-guest { width: 100%; justify-content: center; }
-.auth-submit { margin-top: 2px; }
+.auth-submit { margin-top: 2px; text-decoration: none; }
 .auth-guest { margin-top: 12px; }
 .auth-foot { font-size: 0.75rem; text-align: center; margin: 10px 0 0; }
 
@@ -1122,26 +1124,6 @@ code, pre, .coderunner-out, .cm-editor .cm-scroller {
   .scroll-progress { transition: none; }
 }
 
-/* ─── Playground: side-by-side editor + terminal ── */
-.playground-split {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 14px;
-  align-items: stretch;
-}
-.playground-left,
-.playground-right { min-width: 0; }
-.playground-left .coderunner { margin: 0; height: 100%; display: flex; flex-direction: column; }
-.playground-left .coderunner .cm-editor { flex: 1; min-height: 0; }
-.playground-left .coderunner .cm-scroller { height: 100% !important; }
-@media (max-width: 900px) {
-  .playground-split { grid-template-columns: 1fr; }
-}
-
-/* Playground runs in its own session: output lives in the terminal only */
-.playground-left .coderunner-out,
-.playground-left .stdin-box { display: none; }
-
 /* ─── Terminal ── */
 .term {
   display: flex;
@@ -1233,19 +1215,182 @@ code, pre, .coderunner-out, .cm-editor .cm-scroller {
   .term-stop { transition: none; }
 }
 
-/* ─── Playground fills the viewport (80%+ under header/footer) ── */
-.playground-page { max-width: 1400px; }
-.playground-page .playground-split {
-  height: calc(100vh - 210px);
-  min-height: 560px;
+/* ─── Motion hygiene ─────────────────────────────────────────────────────
+   Press physics stay everywhere. The hover lift is desktop-pointer only, so a
+   touch device can't get stuck in a hovered state, and reduced-motion users get
+   instant state changes instead of movement. */
+@media (hover: none) {
+  .btn:hover,
+  .btn-run:hover,
+  .btn-run.alt:hover,
+  .term-stop:hover,
+  .ltrack:hover,
+  .toplink:hover {
+    transform: none;
+  }
 }
-.playground-left .coderunner { height: 100%; }
-.playground-left .cm-editor { height: 100% !important; }
-.playground-left .cm-scroller { min-height: 0; }
-.playground-right .term { height: 100%; min-height: 0; }
-.term-scroll { flex: 1 1 0; }
+@media (prefers-reduced-motion: reduce) {
+  .btn,
+  .btn-run,
+  .term-stop,
+  .faq-q,
+  .tab,
+  .ltrack,
+  .toplink,
+  .ide-splitter-handle {
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+  .btn:hover,
+  .btn:active,
+  .btn-run:hover,
+  .btn-run:active,
+  .ltrack:hover {
+    transform: none;
+  }
+}
+
+/* --- a11y helper (playground h1) --- */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ─── Playground: a small IDE — editor | splitter | output ─────────────── */
+.main-playground { max-width: none; }
+.playground-page { max-width: 1500px; padding-bottom: 26px; }
+
+.ide {
+  /* first column width, driven by the drag divider (20%–80%) */
+  --ide-left: 54%;
+  --ide-gap: 12px;
+  display: grid;
+  grid-template-columns:
+    calc(var(--ide-left) - var(--ide-gap) / 2)
+    var(--ide-gap)
+    calc(100% - var(--ide-left) - var(--ide-gap) / 2);
+  height: clamp(520px, calc(100vh - var(--top-h, 56px) - 152px), 900px);
+  margin-top: 12px;
+  border: 2px solid var(--ink);
+  border-radius: 16px 8px 17px 9px / 9px 16px 8px 17px;
+  overflow: hidden;
+  background: var(--card);
+  box-shadow: 5px 5px 0 var(--shadow-ink);
+}
+.ide-pane { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+
+/* ── editor toolbar ── */
+.ide-toolbar {
+  flex: none;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 6px 10px;
+  background: var(--card2);
+  border-bottom: 2px solid var(--ink);
+}
+.ide-tab {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 3px 12px;
+  font-family: var(--font-hand-ui); font-size: 0.95rem;
+  color: var(--text);
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 9px 5px 10px 6px / 6px 9px 5px 10px;
+}
+.ide-tab img { display: block; }
+.ide-tools { display: flex; align-items: center; gap: 8px; }
+
+/* ── editor fills its pane, frameless (the .ide frame is the frame) ── */
+.ide-editor { flex: 1; min-height: 0; display: flex; }
+.ide-editor .coderunner {
+  flex: 1; margin: 0;
+  display: flex; flex-direction: column;
+  border: 0; border-radius: 0; box-shadow: none;
+  background: transparent;
+  overflow: hidden;
+}
+.ide-editor .cm-editor { flex: 1; height: 100% !important; min-height: 0; }
+.ide-editor .cm-scroller {
+  min-height: 0;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+.ide-editor .cm-gutters { background: transparent; border-right: 1.5px solid var(--border); }
+
+/* ── plots strip under the editor ── */
+.ide-plots { border-top: 2px solid var(--ink); max-height: 220px; overflow: auto; }
+
+/* ── output pane: toolbar + terminal, no inner frame ── */
+.ide-pane .term-toolbar {
+  flex: none;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 6px 10px;
+  background: var(--card2);
+  border-bottom: 2px solid var(--ink);
+}
+.ide-pane .term-tab {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+.ide-pane .term-tools { display: flex; align-items: center; gap: 8px; }
+.ide-pane .btn-run.alt {
+  background: var(--bad); color: #1a0f0c; font-weight: 700;
+  padding: 4px 12px; font-size: 0.85rem;
+}
+.ide-pane .term {
+  flex: 1; min-height: 0;
+  border: 0; border-radius: 0; box-shadow: none;
+}
+.ide-pane .term-scroll { flex: 1 1 0; }
+
+/* ── drag-to-resize divider ── */
+.ide-splitter {
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  cursor: col-resize;
+  background: var(--bg2);
+  border-left: 2px solid var(--ink);
+  border-right: 2px solid var(--ink);
+  touch-action: none;
+}
+.ide-splitter:focus-visible { outline: none; box-shadow: inset 0 0 0 2px var(--warn); }
+.ide-splitter-handle {
+  display: flex; flex-direction: column; gap: 3px;
+  padding: 7px 3px;
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+}
+.ide-splitter-handle .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--muted); }
+.ide-splitter:hover .ide-splitter-handle,
+.ide-splitter:focus-visible .ide-splitter-handle { border-color: var(--warn); }
+
+/* ── status bar under the IDE ── */
+.ide-status {
+  display: flex; align-items: center; gap: 12px;
+  margin-top: 14px;
+  font-family: var(--font-hand-ui);
+}
+.ide-status-note { flex: 1; text-align: center; color: var(--muted); font-size: 0.88rem; }
+
+/* ── stacked panes on narrow screens ── */
 @media (max-width: 900px) {
-  .playground-page .playground-split { height: auto; }
-  .playground-left .cm-editor { height: 340px !important; }
-  .playground-right .term { height: 380px; }
+  .ide {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(320px, 46vh) 12px minmax(260px, 40vh);
+    height: auto;
+  }
+  .ide-splitter {
+    cursor: row-resize;
+    border-left: 0; border-right: 0;
+    border-top: 2px solid var(--ink);
+    border-bottom: 2px solid var(--ink);
+  }
+  .ide-splitter-handle { flex-direction: row; padding: 3px 7px; }
+  .ide-status { flex-wrap: wrap; }
+  .ide-status-note { order: 3; flex-basis: 100%; text-align: left; }
 }
