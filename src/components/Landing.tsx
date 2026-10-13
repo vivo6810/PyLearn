@@ -21,11 +21,10 @@ const HERO_GLYPHS = [
 const carouselImage = (name: string) => `${import.meta.env.BASE_URL}images/${name}`
 
 const CAROUSEL_ITEMS = [
-  { src: carouselImage('one.jpg'), alt: 'A chrome sculpture', title: 'Iridescence' },
-  { src: carouselImage('two.jpg'), alt: 'A figure on a white set', title: 'White Room' },
-  { src: carouselImage('three.jpg'), alt: 'A clay bust in profile', title: 'Clay Study', subtitle: 'Studio 04' },
   { src: carouselImage('playground.png'), alt: 'PyLearn Playground code editor', title: 'PyLearn', subtitle: 'Playground' },
   { src: carouselImage('practice.png'), alt: 'Interactive Python lesson with runnable worked examples', title: 'Learn Python', subtitle: 'Practice as you learn' },
+  { src: carouselImage('topics.png'), alt: 'PyLearn course topics including Foundations, Core Python, Advanced Python, Tkinter, Data Analysis, and Automation', title: 'Learning paths', subtitle: 'Topics' },
+  { src: carouselImage('achievements.png'), alt: 'PyLearn achievements and certificates for lessons, learning streaks, quizzes, and completed tracks', title: 'Achievements', subtitle: 'Motivation as you learn' },
 ]
 
 export function Landing({ navigate, onStart }: { navigate: (v: string) => void; onStart: () => void }) {
