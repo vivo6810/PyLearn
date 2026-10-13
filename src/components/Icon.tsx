@@ -1,4 +1,5 @@
 import type { ReactElement } from 'react'
+import logoUrl from '../assets/logo.png'
 
 /**
  * PyLearn icon set — custom stroke icons (24x24 grid, 2px round strokes,
@@ -6,14 +7,6 @@ import type { ReactElement } from 'react'
  * Names are referenced as string tokens (curriculum data, toasts, etc.).
  */
 const PATHS: Record<string, ReactElement> = {
-  // brand
-  snake: (
-    <>
-      <path d="M18 6a3 3 0 0 0-3-3H9a3.5 3.5 0 0 0 0 7h6a3.5 3.5 0 0 1 0 7H9a3 3 0 0 1-3-3" />
-      <circle cx="6" cy="14.5" r="1.4" fill="currentColor" stroke="none" />
-    </>
-  ),
-
   // navigation & chrome
   search: (
     <>
@@ -306,6 +299,21 @@ export function Icon({
   className?: string
   style?: React.CSSProperties
 }) {
+  if (name === 'snake') {
+    return (
+      <img
+        src={logoUrl}
+        alt=""
+        aria-hidden="true"
+        className={'icon' + (className ? ' ' + className : '')}
+        width={size}
+        height={size}
+        style={{ ...style, objectFit: 'contain' }}
+        draggable={false}
+      />
+    )
+  }
+
   return (
     <svg
       className={'icon' + (className ? ' ' + className : '')}

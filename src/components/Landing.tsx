@@ -135,14 +135,20 @@ export function Landing({ navigate, onStart }: { navigate: (v: string) => void; 
         </Parallax>
         <div className="feat-grid">
           {[
-            { icon: 'snake', title: 'Edit any example', text: 'Change the code and press Run — NumPy, Pandas and Matplotlib plots included.' },
+            { icon: null, title: 'Edit any example', text: 'Change the code and press Run — NumPy, Pandas and Matplotlib plots included.' },
             { icon: 'target', title: 'Checked exercises', text: 'Hidden test suites grade your code instantly, test by test, with hints when you stall.' },
             { icon: 'save', title: 'Sessions that survive', text: 'Half-finished quizzes, edited examples, notes and drafts — all saved. Close the tab, resume tomorrow.' },
             { icon: 'medal', title: 'XP, streaks & certificates', text: 'Levels, achievements and a printable certificate for every completed track.' },
           ].map((f, i) => (
             <Reveal key={f.title} delay={i * 70}>
               <div className="feat">
-                <span className="feat-icon"><Icon name={f.icon} size={26} /></span>
+                <span className="feat-icon">
+                  {f.icon ? (
+                    <Icon name={f.icon} size={26} />
+                  ) : (
+                    <img src={logoUrl} alt="" aria-hidden="true" width={26} height={26} />
+                  )}
+                </span>
                 <h3>{f.title}</h3>
                 <p>{f.text}</p>
               </div>

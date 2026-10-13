@@ -687,8 +687,7 @@ code, pre, .coderunner-out, .cm-editor .cm-scroller {
 .landing-feats { max-width: 1060px; margin: 0 auto; padding: 90px 18px 40px; }
 .sec-title.center { text-align: center; font-size: 2rem; margin-bottom: 26px; }
 .sec-title.center::after { left: calc(50% - 43px); }
-.feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-@media (max-width: 860px) { .feat-grid { grid-template-columns: 1fr 1fr; } }
+.feat-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 @media (max-width: 560px) { .feat-grid { grid-template-columns: 1fr; } }
 .feat {
   background: var(--card); border: 2px solid var(--ink);
@@ -699,6 +698,7 @@ code, pre, .coderunner-out, .cm-editor .cm-scroller {
 }
 .feat:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--shadow-ink); }
 .feat-icon { display: inline-flex; color: var(--warn); margin-bottom: 4px; }
+.feat-icon img { display: block; object-fit: contain; }
 .feat h3 { margin: 10px 0 6px; font-size: 1.35rem; }
 .feat p { margin: 0; color: var(--muted); font-size: 0.88rem; }
 
