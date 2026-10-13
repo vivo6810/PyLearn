@@ -11,6 +11,7 @@ import {
   loadSession,
   saveProgress,
   saveSessionDebounced,
+  saveThemePreference,
   setStorageScope,
   todayKey,
 } from './storage'
@@ -106,6 +107,7 @@ export function AppProvider({ tracks, children }: { tracks: Track[]; children: R
   const theme = progress.theme
   useEffect(() => {
     document.documentElement.dataset.theme = theme
+    saveThemePreference(theme)
   }, [theme])
   const toggleTheme = useCallback(() => {
     setProgress((p) => {

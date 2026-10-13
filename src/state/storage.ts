@@ -7,6 +7,7 @@ import type { ProgressState, SessionState } from '../types'
 
 const PROGRESS_KEY = 'pylearn.progress.v1'
 const SESSION_KEY = 'pylearn.session.v1'
+const THEME_KEY = 'pylearn.theme.v1'
 
 let scope: string | null = null
 
@@ -73,6 +74,10 @@ export function guestHasProgress(): boolean {
 
 export function saveProgress(p: ProgressState) {
   write(progressKey(), p)
+}
+
+export function saveThemePreference(theme: ProgressState['theme']) {
+  write(THEME_KEY, theme)
 }
 
 /**
