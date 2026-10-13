@@ -23,6 +23,7 @@ const CAROUSEL_ITEMS = [
   { src: '/images/two.jpg', alt: 'A figure on a white set', title: 'White Room' },
   { src: '/images/three.jpg', alt: 'A clay bust in profile', title: 'Clay Study', subtitle: 'Studio 04' },
   { src: '/images/playground.png', alt: 'PyLearn Playground code editor', title: 'PyLearn', subtitle: 'Playground' },
+  { src: '/images/practice.png', alt: 'Interactive Python lesson with runnable worked examples', title: 'Learn Python', subtitle: 'Practice as you learn' },
 ]
 
 export function Landing({ navigate, onStart }: { navigate: (v: string) => void; onStart: () => void }) {
