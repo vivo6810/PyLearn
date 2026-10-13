@@ -166,7 +166,7 @@ code, pre, .coderunner-out, .cm-editor .cm-scroller {
 .btn.big { font-size: 1.15rem; padding: 10px 22px; }
 .btn.danger { color: var(--bad); border-color: var(--ink); }
 .btn.ghost.danger { background: transparent; }
-.link { background: none; border: 0; color: var(--text); cursor: pointer; padding: 0; font-size: inherit; text-decoration: underline; text-decoration-style: wavy; text-decoration-color: var(--warn); text-underline-offset: 3px; }
+.link { background: none; border: 0; color: var(--text); cursor: pointer; padding: 0; font-family: var(--font-hand-ui); font-size: inherit; text-decoration: underline; text-decoration-style: wavy; text-decoration-color: var(--warn); text-underline-offset: 3px; }
 .link:hover { color: var(--warn); }
 .muted { color: var(--muted); }
 
@@ -1024,6 +1024,12 @@ code, pre, .coderunner-out, .cm-editor .cm-scroller {
 }
 .account-name { max-width: 92px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 @media (max-width: 620px) { .account-name { display: none; } }
+@media (max-width: 560px) {
+  .topbar { padding: 6px 8px; }
+  .topnav { gap: 0; }
+  .toplink { padding: 5px 6px; }
+  .toplink-label { display: none; }
+}
 
 /* ─── Dot-grid background (cursor reveals a soft pool of light) ── */
 .dotgrid {

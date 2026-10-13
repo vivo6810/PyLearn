@@ -30,7 +30,7 @@ export function TrackView({ trackId, navigate }: { trackId: string; navigate: (v
     <div className="page">
       <button className="link" onClick={() => navigate('dashboard')}>← Dashboard</button>
       <header className="track-head">
-        <span className="track-icon big" style={{ color: track.accent }}>
+        <span className="track-icon big" style={{ color: `color-mix(in srgb, ${track.accent} 35%, var(--text))` }}>
           <Icon name={track.icon} size={30} />
         </span>
         <div>
@@ -103,4 +103,3 @@ function trackFaq(_track: typeof tracks[number]) {
     },
   ]
 }
-

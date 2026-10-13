@@ -151,29 +151,29 @@ function Shell() {
             <Logo size={26} /> PyLearn
           </button>
           <nav className="topnav">
-            <button className={'toplink' + (root === 'reference' ? ' active' : '')} onClick={() => navigate('reference')}>
-              <Icon name="search" size={16} /> Search
+            <button className={'toplink' + (root === 'reference' ? ' active' : '')} onClick={() => navigate('reference')} aria-label="Search">
+              <Icon name="search" size={16} /> <span className="toplink-label">Search</span>
             </button>
-            <button className={'toplink' + (root === 'playground' ? ' active' : '')} onClick={() => navigate('playground')}>
-              <Icon name="flask" size={16} /> Playground
+            <button className={'toplink' + (root === 'playground' ? ' active' : '')} onClick={() => navigate('playground')} aria-label="Playground">
+              <Icon name="flask" size={16} /> <span className="toplink-label">Playground</span>
             </button>
-            <button className="toplink" onClick={goFaq} title="Frequently asked questions">
-              <Icon name="help" size={16} /> FAQ
+            <button className="toplink" onClick={goFaq} title="Frequently asked questions" aria-label="Frequently asked questions">
+              <Icon name="help" size={16} /> <span className="toplink-label">FAQ</span>
             </button>
-            <button className={'toplink' + (root === 'settings' ? ' active' : '')} onClick={() => navigate('settings')} title="Settings">
+            <button className={'toplink' + (root === 'settings' ? ' active' : '')} onClick={() => navigate('settings')} title="Settings" aria-label="Settings">
               <Icon name="gear" size={16} />
             </button>
             {auth ? (
-              <button className="toplink account-btn" onClick={() => navigate('settings')} title={`${auth.name} — account settings`}>
+              <button className="toplink account-btn" onClick={() => navigate('settings')} title={`${auth.name} — account settings`} aria-label={`${auth.name} — account settings`}>
                 <span className="avatar">{initials(auth.name)}</span>
                 <span className="account-name">{auth.name}</span>
               </button>
             ) : accountsEnabled ? (
-              <button className="toplink" onClick={() => navigate('auth')} title="Sign in">
-                <Icon name="lock" size={16} /> Sign in
+              <button className="toplink" onClick={() => navigate('auth')} title="Sign in" aria-label="Sign in">
+                <Icon name="lock" size={16} /> <span className="toplink-label">Sign in</span>
               </button>
             ) : null}
-            <button className="toplink" onClick={swapTheme} title="Toggle theme">
+            <button className="toplink" onClick={swapTheme} title="Toggle theme" aria-label="Toggle theme">
               <Icon name={theme === 'dark' ? 'sun' : 'moon'} size={16} />
             </button>
           </nav>
