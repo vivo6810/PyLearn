@@ -38,28 +38,17 @@ jobs:
       - name: Build static site
         run: npm run build
         env:
-          # Project sites serve from /<repo>/, user sites (username.github.io)
-          # serve from the domain root — derive the prefix from the repo name.
+          # Project sites serve from /<repo>/ — this repository (PyLearn)
+          # publishes to https://vivo6810.github.io/PyLearn/. User sites
+          # (username.github.io) serve from the domain root. Derive the asset
+          # prefix from the repository name.
           VITE_BASE: ${{ github.event.repository.name == 'PyLearn' && '/PyLearn/' || '/' }}
 
       - uses: actions/configure-pages@v5
 
-      - name: Prepare legacy URL redirect
-        if: github.event.repository.name == 'PyLearn' && github.event_name != 'workflow_dispatch'
-        run: |
-          mkdir -p legacy-site
-          cp public/legacy-redirect.html legacy-site/index.html
-          cp public/legacy-redirect.html legacy-site/404.html
-
       - uses: actions/upload-pages-artifact@v3
-        if: github.event.repository.name != 'PyLearn' || github.event_name == 'workflow_dispatch'
         with:
           path: dist
-
-      - uses: actions/upload-pages-artifact@v3
-        if: github.event.repository.name == 'PyLearn' && github.event_name != 'workflow_dispatch'
-        with:
-          path: legacy-site
 
   deploy:
     needs: build
