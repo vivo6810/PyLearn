@@ -2,7 +2,7 @@ import { Reveal } from './Reveal'
 import { Appear } from './Appear'
 import { Icon } from './Icon'
 import { Parallax } from './Parallax'
-import FlexCarousel from './FlexCarousel'
+import { TrackPreviewCarousel } from './TrackPreviewCarousel'
 import { FAQ } from './FAQ'
 import { tracks, allLessons, totalMinutes } from '../curriculum'
 import logoUrl from '../assets/logo.png'
@@ -15,17 +15,6 @@ const HERO_GLYPHS = [
   { ch: '[ ]', x: '86%', y: '60%', size: 24, depth: 0.16, opacity: 0.15 },
   { ch: '=>', x: '68%', y: '82%', size: 20, depth: 0.26, opacity: 0.1 },
   { ch: 'print', x: '30%', y: '8%', size: 18, depth: 0.12, opacity: 0.1 },
-]
-
-/** Slides for the track carousel. */
-const carouselImage = (name: string) => `${import.meta.env.BASE_URL}images/${name}`
-
-const CAROUSEL_ITEMS = [
-  { src: carouselImage('one.jpg'), alt: 'A chrome sculpture', title: 'Iridescence' },
-  { src: carouselImage('two.jpg'), alt: 'A figure on a white set', title: 'White Room' },
-  { src: carouselImage('three.jpg'), alt: 'A clay bust in profile', title: 'Clay Study', subtitle: 'Studio 04' },
-  { src: carouselImage('playground.png'), alt: 'PyLearn Playground code editor', title: 'PyLearn', subtitle: 'Playground' },
-  { src: carouselImage('practice.png'), alt: 'Interactive Python lesson with runnable worked examples', title: 'Learn Python', subtitle: 'Practice as you learn' },
 ]
 
 export function Landing({ navigate, onStart }: { navigate: (v: string) => void; onStart: () => void }) {
@@ -98,34 +87,10 @@ export function Landing({ navigate, onStart }: { navigate: (v: string) => void; 
         </div>
       </section>
 
-      {/* ── carousel: the 6 tracks through a liquid lens ── */}
+      {/* ── carousel: preview each learning track ── */}
       <section id="disc" className="xp-section">
-        <div style={{ width: '100%', height: '680px', position: 'relative' }}>
-          <FlexCarousel
-            items={CAROUSEL_ITEMS}
-            preset="liquid"
-            intro="rise"
-            cardHeight={0.56}
-            gap={12}
-            squeeze={0.2}
-            focusOnClick
-            captions
-            fit="natural"
-            radius={0}
-            lensWidth={0.74}
-            lensHeight={1.18}
-            tilt={74}
-            roundness={1}
-            bend={0.34}
-            reach={0.38}
-            curl="twist"
-            dispersion={0.45}
-            liquid={0}
-            followCursor={false}
-            autoplay={false}
-            interval={4}
-            captureWheel
-          />
+        <div className="track-preview-section">
+          <TrackPreviewCarousel tracks={tracks} onOpen={(id) => navigate(`track:${id}`)} />
         </div>
       </section>
 

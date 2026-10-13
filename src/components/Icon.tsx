@@ -21,6 +21,8 @@ const PATHS: Record<string, ReactElement> = {
       <path d="m21 21-4.3-4.3" />
     </>
   ),
+  'arrow-left': <path d="M19 12H5m7 7-7-7 7-7" />,
+  'arrow-right': <path d="M5 12h14m-7-7 7 7-7 7" />,
   copy: (
     <>
       <rect x="9" y="9" width="12" height="12" rx="2" />
