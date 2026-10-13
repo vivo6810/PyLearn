@@ -18,12 +18,14 @@ const HERO_GLYPHS = [
 ]
 
 /** Slides for the track carousel. */
+const carouselImage = (name: string) => `${import.meta.env.BASE_URL}images/${name}`
+
 const CAROUSEL_ITEMS = [
-  { src: '/images/one.jpg', alt: 'A chrome sculpture', title: 'Iridescence' },
-  { src: '/images/two.jpg', alt: 'A figure on a white set', title: 'White Room' },
-  { src: '/images/three.jpg', alt: 'A clay bust in profile', title: 'Clay Study', subtitle: 'Studio 04' },
-  { src: '/images/playground.png', alt: 'PyLearn Playground code editor', title: 'PyLearn', subtitle: 'Playground' },
-  { src: '/images/practice.png', alt: 'Interactive Python lesson with runnable worked examples', title: 'Learn Python', subtitle: 'Practice as you learn' },
+  { src: carouselImage('one.jpg'), alt: 'A chrome sculpture', title: 'Iridescence' },
+  { src: carouselImage('two.jpg'), alt: 'A figure on a white set', title: 'White Room' },
+  { src: carouselImage('three.jpg'), alt: 'A clay bust in profile', title: 'Clay Study', subtitle: 'Studio 04' },
+  { src: carouselImage('playground.png'), alt: 'PyLearn Playground code editor', title: 'PyLearn', subtitle: 'Playground' },
+  { src: carouselImage('practice.png'), alt: 'Interactive Python lesson with runnable worked examples', title: 'Learn Python', subtitle: 'Practice as you learn' },
 ]
 
 export function Landing({ navigate, onStart }: { navigate: (v: string) => void; onStart: () => void }) {
