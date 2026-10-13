@@ -17,11 +17,12 @@ const HERO_GLYPHS = [
   { ch: 'print', x: '30%', y: '8%', size: 18, depth: 0.12, opacity: 0.1 },
 ]
 
-/** Placeholder slides for the track carousel — swap in real photography later. */
+/** Slides for the track carousel. */
 const CAROUSEL_ITEMS = [
   { src: '/images/one.jpg', alt: 'A chrome sculpture', title: 'Iridescence' },
   { src: '/images/two.jpg', alt: 'A figure on a white set', title: 'White Room' },
   { src: '/images/three.jpg', alt: 'A clay bust in profile', title: 'Clay Study', subtitle: 'Studio 04' },
+  { src: '/images/playground.png', alt: 'PyLearn Playground code editor', title: 'PyLearn', subtitle: 'Playground' },
 ]
 
 export function Landing({ navigate, onStart }: { navigate: (v: string) => void; onStart: () => void }) {
@@ -212,4 +213,3 @@ function landingFaq() {
     },
   ]
 }
-
