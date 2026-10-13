@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import type { View } from './App'
 import { tracks, allLessons } from './curriculum'
-import logoUrl from './assets/logo.png'
+const logoUrl = `${import.meta.env.BASE_URL}favicon.png`
 
 const SITE_URL = 'https://vivo6810.github.io'
 

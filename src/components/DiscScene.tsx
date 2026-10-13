@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { Icon } from './Icon'
-import logoUrl from '../assets/logo.png'
+const logoUrl = `${import.meta.env.BASE_URL}favicon.png`
 import { tracks } from '../curriculum'
 
 /** Existing images / badges that orbit the disc. We reuse the track icon set
