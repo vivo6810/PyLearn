@@ -67,12 +67,6 @@ export function Landing({ navigate, onStart }: { navigate: (v: string) => void; 
               </h1>
             </Appear>
           </span>
-          <Appear variant="soft" delay={0.42}>
-            <p className="hero-sub">
-              Short lessons, live examples and graded practice — a straight path from your first print() to programs
-              you actually want to build.
-            </p>
-          </Appear>
           <Appear variant="btn" delay={0.55}>
             <div className="hero-cta">
               <button className="btn primary big" onClick={onStart}>
