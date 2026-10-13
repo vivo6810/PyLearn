@@ -1,5 +1,4 @@
 import logoUrl from '../assets/logo.png'
-const logoUrl = `${import.meta.env.BASE_URL}favicon.png`
 
 /**
  * PyLearn brand mark — the official two-snakes Python logo (grungy cutout).

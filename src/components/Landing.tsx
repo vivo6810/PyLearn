@@ -5,7 +5,7 @@ import { Parallax } from './Parallax'
 import FlexCarousel from './FlexCarousel'
 import { FAQ } from './FAQ'
 import { tracks, allLessons, totalMinutes } from '../curriculum'
-const logoUrl = `${import.meta.env.BASE_URL}favicon.png`
+import logoUrl from '../assets/logo.png'
 
 /** faint code glyphs floating behind the hero at different depths */
 const HERO_GLYPHS = [
